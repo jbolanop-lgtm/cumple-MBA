@@ -1,394 +1,135 @@
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
-
-  :root {
-    --navy: #0B1F3A;
-    --gold: #C9992A;
-    --gold-light: #F0C96A;
-    --cream: #FAF7F0;
-    --navy-light: #1A3358;
-  }
-
-  .cal-wrap {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--navy);
-    padding: 0;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .cal-header {
-    background: linear-gradient(135deg, #0B1F3A 0%, #1A3358 100%);
-    border-bottom: 2px solid var(--gold);
-    padding: 28px 32px 22px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .cal-header-left h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gold-light);
-    margin: 0 0 4px;
-    letter-spacing: 0.5px;
-  }
-
-  .cal-header-left p {
-    font-size: 12px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.55);
-    margin: 0;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-  }
-
-  .cal-header-badge {
-    background: rgba(201,153,42,0.15);
-    border: 1px solid rgba(201,153,42,0.4);
-    border-radius: 50px;
-    padding: 6px 16px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--gold-light);
-    letter-spacing: 0.5px;
-  }
-
-  .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: rgba(255,255,255,0.06);
-    padding: 1px;
-  }
-
-  .month-card {
-    background: #0F2444;
-    padding: 16px 18px;
-    transition: background 0.2s;
-  }
-
-  .month-card:hover {
-    background: #162d52;
-  }
-
-  .month-empty {
-    background: #0A1B35;
-    padding: 16px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 80px;
-  }
-
-  .month-empty span {
-    font-size: 11px;
-    color: rgba(255,255,255,0.12);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .month-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    padding-bottom: 9px;
-    border-bottom: 1px solid rgba(201,153,42,0.25);
-  }
-
-  .month-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gold);
-    background: rgba(201,153,42,0.12);
-    border-radius: 4px;
-    padding: 2px 7px;
-    letter-spacing: 0.5px;
-  }
-
-  .month-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.92);
-    letter-spacing: 0.3px;
-  }
-
-  .person-row {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 7px;
-  }
-
-  .person-row:last-child {
-    margin-bottom: 0;
-  }
-
-  .avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 500;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .person-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .person-name {
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.9);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-  }
-
-  .person-date {
-    font-size: 10px;
-    color: var(--gold);
-    font-weight: 400;
-    letter-spacing: 0.3px;
-  }
-
-  .cake-icon {
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-
-  .cal-footer {
-    background: #0A1B35;
-    border-top: 1px solid rgba(201,153,42,0.2);
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .footer-text {
-    font-size: 10px;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .footer-count {
-    font-size: 10px;
-    color: var(--gold);
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
-
-  .legend {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .legend-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .legend-label {
-    font-size: 10px;
-    color: rgba(255,255,255,0.35);
-  }
-</style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario MBA IUB</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+        :root { --navy: #0B1F3A; --gold: #C9992A; --gold-light: #F0C96A; --navy-light: #1A3358; }
+        body { background: #051121; padding: 20px; color: white; font-family: 'DM Sans', sans-serif; margin: 0; }
+        .cal-wrap { max-width: 1000px; margin: 0 auto; background: var(--navy); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .cal-header { background: linear-gradient(135deg, #0B1F3A 0%, #1A3358 100%); border-bottom: 2px solid var(--gold); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
+        .cal-header-left h1 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--gold-light); margin: 0; }
+        .btn-add { background: var(--gold); color: var(--navy); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-add:hover { transform: scale(1.05); background: var(--gold-light); }
+        .cal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: rgba(255,255,255,0.06); }
+        .month-card { background: #0F2444; padding: 18px; min-height: 120px; }
+        .month-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid rgba(201,153,42,0.25); padding-bottom: 5px; }
+        .month-num { color: var(--gold); font-family: 'Playfair Display', serif; font-weight: bold; }
+        .person-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; animation: fadeIn 0.5s ease; }
+        .avatar { width: 35px; height: 35px; border-radius: 50%; background: rgba(201,153,42,0.2); color: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 1px solid rgba(201,153,42,0.3); }
+        .person-name { font-size: 13px; font-weight: 500; }
+        .person-date { font-size: 11px; color: var(--gold); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--navy-light); padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid var(--gold); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #0B1F3A; border: 1px solid rgba(201,153,42,0.3); color: white; border-radius: 6px; box-sizing: border-box; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
 
 <div class="cal-wrap">
-  <div class="cal-header">
-    <div class="cal-header-left">
-      <h1>Calendario de Cumpleaños</h1>
-      <p>Maestría en Administración de Empresas · IUB 2026</p>
+    <div class="cal-header">
+        <div class="cal-header-left">
+            <h1>Calendario de Cumpleaños</h1>
+            <p style="color:rgba(255,255,255,0.5); font-size: 12px; margin: 5px 0 0;">MBA · IUB 2026</p>
+        </div>
+        <button class="btn-add" onclick="toggleModal(true)">+ Agregar Compañero</button>
     </div>
-    <div class="cal-header-badge">12 compañeros</div>
-  </div>
-
-  <div class="cal-grid">
-
-    <div class="month-empty"><span>Enero</span></div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">02</span>
-        <span class="month-name">Febrero</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(100,149,237,0.18);color:#89b4f8;">MM</div>
-        <div class="person-info">
-          <div class="person-name">María Maury</div>
-          <div class="person-date">7 de febrero</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
+    <div class="cal-grid" id="calendarGrid"></div>
+    <div style="padding: 20px; text-align: center; font-size: 11px; color: var(--gold-light); opacity: 0.7;">
+        INSTITUCIÓN UNIVERSITARIA DE BARRANQUILLA · 2026
     </div>
-
-    <div class="month-empty"><span>Marzo</span></div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">04</span>
-        <span class="month-name">Abril</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(144,238,144,0.15);color:#7ec47e;">SN</div>
-        <div class="person-info">
-          <div class="person-name">Samuel Noguera</div>
-          <div class="person-date">5 de abril</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(255,182,193,0.18);color:#f4a7b9;">KE</div>
-        <div class="person-info">
-          <div class="person-name">Keila Eljaiek Polo</div>
-          <div class="person-date">12 de abril</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">05</span>
-        <span class="month-name">Mayo</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(255,215,0,0.15);color:#d4a017;">KR</div>
-        <div class="person-info">
-          <div class="person-name">Kevin Rodríguez</div>
-          <div class="person-date">14 de mayo</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(201,153,42,0.2);color:#e8b84b;">MG</div>
-        <div class="person-info">
-          <div class="person-name">María A. Gómez</div>
-          <div class="person-date">19 de mayo</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">06</span>
-        <span class="month-name">Junio</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(72,209,204,0.15);color:#5ecfca;">EH</div>
-        <div class="person-info">
-          <div class="person-name">Eliu Hernández</div>
-          <div class="person-date">30 de junio</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-empty"><span>Julio</span></div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">08</span>
-        <span class="month-name">Agosto</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(147,112,219,0.18);color:#b09be8;">SH</div>
-        <div class="person-info">
-          <div class="person-name">Samuel Herrera</div>
-          <div class="person-date">4 de agosto</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">09</span>
-        <span class="month-name">Septiembre</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(255,140,0,0.15);color:#e8963a;">EV</div>
-        <div class="person-info">
-          <div class="person-name">Elvecia Vásquez</div>
-          <div class="person-date">14 de septiembre</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(201,153,42,0.25);color:#f0c96a;">JB</div>
-        <div class="person-info">
-          <div class="person-name">Jeider Bolaño</div>
-          <div class="person-date">28 de septiembre</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">10</span>
-        <span class="month-name">Octubre</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(100,149,237,0.2);color:#7aaae8;">OF</div>
-        <div class="person-info">
-          <div class="person-name">Octavio Fernández</div>
-          <div class="person-date">24 de octubre</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(144,238,144,0.18);color:#7ec47e;">AB</div>
-        <div class="person-info">
-          <div class="person-name">Andrés Barba</div>
-          <div class="person-date">15 de octubre</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-card">
-      <div class="month-header">
-        <span class="month-num">11</span>
-        <span class="month-name">Noviembre</span>
-      </div>
-      <div class="person-row">
-        <div class="avatar" style="background:rgba(255,99,132,0.15);color:#f77fa0;">JS</div>
-        <div class="person-info">
-          <div class="person-name">José Barón Higuita</div>
-          <div class="person-date">24 de noviembre</div>
-        </div>
-        <span class="cake-icon">🎂</span>
-      </div>
-    </div>
-
-    <div class="month-empty"><span>Diciembre</span></div>
-
-  </div>
-
-  <div class="cal-footer">
-    <div class="legend">
-      <span class="legend-dot" style="background:var(--gold);"></span>
-      <span class="legend-label">MBA · Administración de Empresas</span>
-    </div>
-    <div class="footer-count">IUB · Barranquilla · 2026</div>
-  </div>
 </div>
+
+<div class="modal" id="formModal">
+    <div class="modal-content">
+        <h2 style="color: var(--gold-light); margin: 0 0 15px 0; font-family: 'Playfair Display', serif;">Nuevo Registro</h2>
+        <input type="text" id="name" placeholder="Nombre completo">
+        <select id="month">
+            <option value="0">Enero</option><option value="1">Febrero</option>
+            <option value="2">Marzo</option><option value="3">Abril</option>
+            <option value="4">Mayo</option><option value="5">Junio</option>
+            <option value="6">Julio</option><option value="7">Agosto</option>
+            <option value="8">Septiembre</option><option value="9">Octubre</option>
+            <option value="10">Noviembre</option><option value="11">Diciembre</option>
+        </select>
+        <input type="number" id="day" placeholder="Día" min="1" max="31">
+        <button class="btn-add" style="width: 100%; margin-top: 10px;" onclick="saveData()">Guardar en la Nube</button>
+        <button onclick="toggleModal(false)" style="background:transparent; border:none; color:rgba(255,255,255,0.5); width:100%; cursor:pointer; margin-top:15px; font-size:12px;">Cerrar ventana</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmk2mpWvlR8NbZicA7alTh7XFZw1KCtjA",
+      authDomain: "cumple-mba.firebaseapp.com",
+      projectId: "cumple-mba",
+      storageBucket: "cumple-mba.firebasestorage.app",
+      messagingSenderId: "34399858328",
+      appId: "1:34399858328:web:3807b6b76cbd74f4396aed"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const usersRef = collection(db, "cumpleaños");
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    function initCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        months.forEach((m, i) => {
+            grid.innerHTML += `
+                <div class="month-card" id="month-${i}">
+                    <div class="month-header">
+                        <span class="month-num">${(i+1).toString().padStart(2, '0')}</span>
+                        <span class="month-name">${m}</span>
+                    </div>
+                    <div class="people-list"></div>
+                </div>`;
+        });
+    }
+
+    onSnapshot(query(usersRef, orderBy("day", "asc")), (snapshot) => {
+        initCalendar();
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const monthDiv = document.querySelector(`#month-${data.month} .people-list`);
+            if (monthDiv) {
+                const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+                monthDiv.innerHTML += `
+                    <div class="person-row">
+                        <div class="avatar">${initials}</div>
+                        <div class="person-info">
+                            <div class="person-name">${data.name}</div>
+                            <div class="person-date">${data.day} de ${months[data.month]}</div>
+                        </div>
+                        <span>🎂</span>
+                    </div>`;
+            }
+        });
+    });
+
+    window.saveData = async () => {
+        const name = document.getElementById('name').value;
+        const month = parseInt(document.getElementById('month').value);
+        const day = parseInt(document.getElementById('day').value);
+        if(!name || !day) return alert("Por favor escribe el nombre y el día");
+        try {
+            await addDoc(usersRef, { name, month, day });
+            toggleModal(false);
+            document.getElementById('name').value = '';
+            document.getElementById('day').value = '';
+        } catch (e) { alert("Error al guardar: " + e.message); }
+    };
+
+    window.toggleModal = (show) => { document.getElementById('formModal').style.display = show ? 'flex' : 'none'; };
+    initCalendar();
+</script>
+</body>
+</html>
