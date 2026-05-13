@@ -1,41 +1,372 @@
-window.saveData = async () => {
-    const id = document.getElementById('editId').value;
-    const nameInput = document.getElementById('name').value.trim();
-    const monthInput = document.getElementById('month').value;
-    const dayInput = document.getElementById('day').value;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Premium MBA IUB</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;700&display=swap');
 
-    // 1. Validación básica para evitar registros vacíos
-    if (!nameInput || !dayInput) {
-        alert("Por favor, completa el nombre y el día antes de guardar.");
-        return;
-    }
-
-    const payload = {
-        name: nameInput,
-        month: parseInt(monthInput),
-        day: parseInt(dayInput)
-    };
-
-    try {
-        if (id) {
-            // Actualizar registro existente
-            await updateDoc(doc(db, "cumpleaños", id), payload);
-            alert("¡Registro actualizado con éxito! 🎂");
-        } else {
-            // Guardar nuevo registro
-            await addDoc(colRef, payload);
-            alert("¡Compañero guardado exitosamente! 🥳");
+        :root {
+            --navy: #0B1F3A;
+            --navy-light: #1A3358;
+            --gold: #C9992A;
+            --gold-light: #F0C96A;
+            --danger: #ff4d4d;
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
-        // 2. Cerrar la ventana emergente automáticamente
-        closeModal();
+        body { 
+            background: #051121; 
+            color: white; 
+            font-family: 'DM Sans', sans-serif; 
+            margin: 0; 
+            padding: 20px;
+        }
 
-        // 3. Limpiar los campos para la próxima vez
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* PANEL DE PRÓXIMO CUMPLEAÑOS */
+        .next-birthday-panel {
+            background: linear-gradient(135deg, var(--navy-light) 0%, #051121 100%);
+            border: 1px solid var(--gold);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #countdown {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--gold-light);
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(201, 153, 42, 0.4);
+        }
+
+        /* CALENDARIO */
+        .cal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .month-card {
+            background: var(--navy);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .month-card:hover { border-color: var(--gold); }
+
+        .month-name {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold-light);
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        /* FILA DE PERSONA */
+        .person-row {
+            display: flex;
+            align-items: center;
+            background: var(--glass);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-edit { color: var(--gold-light); }
+        .btn-delete { color: var(--danger); }
+        .btn-edit:hover, .btn-delete:hover { background: rgba(255,255,255,0.1); }
+
+        /* FORMULARIO MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+
+        .modal-content {
+            background: var(--navy-light);
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            border: 1px solid var(--gold);
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            border: none; padding: 12px;
+            width: 100%; border-radius: 8px;
+            font-weight: bold; cursor: pointer;
+            color: var(--navy);
+            font-size: 1rem;
+        }
+
+        input, select {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            background: #051121; border: 1px solid var(--gold);
+            color: white; border-radius: 6px; box-sizing: border-box;
+        }
+
+        .avatar {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: var(--gold); color: var(--navy);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; margin-right: 12px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- PANEL DE CUENTA REGRESIVA -->
+    <div class="next-birthday-panel" id="nextBdayPanel">
+        <span style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; color: var(--gold);">Próximo Cumpleaños</span>
+        <div id="countdown">Calculando...</div>
+        <div id="nextPersonName" style="font-weight: bold; font-size: 1.2rem;">---</div>
+    </div>
+
+    <div class="cal-header">
+        <div>
+            <h1 style="font-family:'Playfair Display'; margin:0; color: var(--gold-light);">Calendario MBA</h1>
+            <p style="margin:0; opacity:0.6; font-size:0.9rem;">IUB · Barranquilla 2026</p>
+        </div>
+        <button class="btn-primary" style="width:auto; padding: 10px 20px;" onclick="openModal()">+ Agregar Compañero</button>
+    </div>
+
+    <div class="cal-grid" id="calendarGrid"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="formModal">
+    <div class="modal-content">
+        <h2 id="modalTitle" style="color:var(--gold-light); margin-top: 0;">Nuevo Registro</h2>
+        <input type="hidden" id="editId">
+        <input type="text" id="name" placeholder="Nombre completo">
+        <select id="month">
+            <option value="0">Enero</option><option value="1">Febrero</option>
+            <option value="2">Marzo</option><option value="3">Abril</option>
+            <option value="4">Mayo</option><option value="5">Junio</option>
+            <option value="6">Julio</option><option value="7">Agosto</option>
+            <option value="8">Septiembre</option><option value="9">Octubre</option>
+            <option value="10">Noviembre</option><option value="11">Diciembre</option>
+        </select>
+        <input type="number" id="day" placeholder="Día" min="1" max="31">
+        <button class="btn-primary" id="btnSave" onclick="saveData()">Guardar Datos</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:gray; width:100%; margin-top:15px; cursor:pointer; font-size: 0.9rem;">Cancelar / Cerrar</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, updateDoc } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // --- CONFIGURACIÓN DE FIREBASE ---
+    // REEMPLAZA ESTO CON TUS DATOS DE FIREBASE CONSOLE
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_PROYECTO.firebaseapp.com",
+        projectId: "TU_PROYECTO_ID",
+        storageBucket: "TU_PROYECTO.appspot.com",
+        messagingSenderId: "TU_ID",
+        appId: "TU_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const colRef = collection(db, "cumpleaños");
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    let timerInterval = null;
+
+    // Inicializar rejilla de meses
+    function initGrid() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        months.forEach((m, i) => {
+            grid.innerHTML += `
+                <div class="month-card" id="month-${i}">
+                    <div class="month-name">${m}</div>
+                    <div class="list"></div>
+                </div>`;
+        });
+    }
+
+    // Escuchar cambios en tiempo real
+    onSnapshot(query(colRef, orderBy("day")), (snapshot) => {
+        initGrid();
+        let allBirthdays = [];
+        snapshot.forEach(d => {
+            const data = d.data();
+            data.id = d.id;
+            allBirthdays.push(data);
+            renderPerson(data);
+        });
+        updateCountdown(allBirthdays);
+    });
+
+    function renderPerson(data) {
+        const list = document.querySelector(`#month-${data.month} .list`);
+        if(!list) return;
+
+        const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+        
+        const div = document.createElement('div');
+        div.className = 'person-row';
+        div.innerHTML = `
+            <div class="avatar">${initials}</div>
+            <div style="flex:1">
+                <div style="font-size:0.9rem; font-weight:500;">${data.name}</div>
+                <div style="font-size:0.75rem; color:var(--gold)">${data.day} de ${months[data.month]}</div>
+            </div>
+            <div class="actions">
+                <button class="btn-icon btn-edit" title="Editar" onclick="editEntry('${data.id}', '${data.name}', ${data.month}, ${data.day})">✎</button>
+                <button class="btn-icon btn-delete" title="Eliminar" onclick="deleteEntry('${data.id}')">✕</button>
+            </div>
+        `;
+        list.appendChild(div);
+    }
+
+    // LÓGICA DE CUENTA REGRESIVA
+    function updateCountdown(birthdays) {
+        if (birthdays.length === 0) {
+            document.getElementById('countdown').innerText = "Sin fechas";
+            document.getElementById('nextPersonName').innerText = "Agrega a alguien para comenzar";
+            return;
+        }
+
+        if(timerInterval) clearInterval(timerInterval);
+
+        const calculateNext = () => {
+            const now = new Date();
+            const year = now.getFullYear();
+
+            let next = birthdays.map(b => {
+                let bdate = new Date(year, b.month, b.day);
+                if (bdate < now) bdate.setFullYear(year + 1);
+                return { ...b, fullDate: bdate };
+            }).sort((a, b) => a.fullDate - b.fullDate)[0];
+
+            document.getElementById('nextPersonName').innerText = `Es el cumpleaños de ${next.name}`;
+            
+            const diff = next.fullDate - new Date();
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / 1000 / 60) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            
+            document.getElementById('countdown').innerText = `${d}d ${h}h ${m}m ${s}s`;
+        };
+
+        calculateNext();
+        timerInterval = setInterval(calculateNext, 1000);
+    }
+
+    // --- FUNCIONES GLOBALES (CRUD) ---
+
+    window.saveData = async () => {
+        const id = document.getElementById('editId').value;
+        const name = document.getElementById('name').value.trim();
+        const month = parseInt(document.getElementById('month').value);
+        const day = parseInt(document.getElementById('day').value);
+
+        if (!name || !day) {
+            alert("Por favor completa nombre y día.");
+            return;
+        }
+
+        const payload = { name, month, day };
+        const btn = document.getElementById('btnSave');
+        btn.disabled = true;
+        btn.innerText = "Guardando...";
+
+        try {
+            if (id) {
+                await updateDoc(doc(db, "cumpleaños", id), payload);
+                alert("¡Registro actualizado con éxito! 🎂");
+            } else {
+                await addDoc(colRef, payload);
+                alert("¡Compañero guardado exitosamente! 🥳");
+            }
+            closeModal();
+        } catch (e) {
+            console.error(e);
+            alert("Error al guardar.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Guardar Datos";
+        }
+    };
+
+    window.deleteEntry = async (id) => {
+        if(confirm("¿Seguro que quieres eliminar este registro?")) {
+            await deleteDoc(doc(db, "cumpleaños", id));
+        }
+    };
+
+    window.editEntry = (id, name, month, day) => {
+        document.getElementById('modalTitle').innerText = "Editar Compañero";
+        document.getElementById('editId').value = id;
+        document.getElementById('name').value = name;
+        document.getElementById('month').value = month;
+        document.getElementById('day').value = day;
+        document.getElementById('formModal').style.display = 'flex';
+    };
+
+    window.openModal = () => {
+        document.getElementById('modalTitle').innerText = "Nuevo Registro";
+        document.getElementById('editId').value = '';
         document.getElementById('name').value = '';
         document.getElementById('day').value = '';
-        
-    } catch (error) {
-        console.error("Error al guardar:", error);
-        alert("Hubo un error al guardar los datos. Inténtalo de nuevo.");
-    }
-};
+        document.getElementById('formModal').style.display = 'flex';
+    };
+
+    window.closeModal = () => {
+        document.getElementById('formModal').style.display = 'none';
+    };
+
+</script>
+</body>
+</html>
