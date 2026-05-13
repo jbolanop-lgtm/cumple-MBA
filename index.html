@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspiración Boutique - Acceso Seguro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Estilos del Login */
+        #loginSection { min-height: 100vh; background: linear-gradient(135deg, #0d6efd 0%, #1a1d20 100%); }
+        .login-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
+        
+        /* Estilos de la App */
+        .sidebar { min-height: 100vh; background-color: #1a1d20; color: white; transition: all 0.3s; display: flex; flex-direction: column; }
+        .nav-link { color: #adb5bd; cursor: pointer; padding: 12px 20px; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: #0d6efd; border-radius: 8px; }
+        .card-kpi { border-radius: 12px; transition: transform 0.2s; }
+        .card-kpi:hover { transform: translateY(-3px); }
+        .section-view { display: none; }
+        .section-view.active { display: block; animation: fadeIn 0.4s; }
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .cloud-indicator { font-size: 0.85rem; color: #20c997; font-weight: bold; }
+        .fila-articulo { background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #e9ecef; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 767.98px) {
+            .sidebar { min-height: auto; position: sticky; top: 0; z-index: 1050; padding: 10px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+            .sidebar h4 { font-size: 1.2rem; margin-bottom: 10px !important; margin-top: 0 !important; }
+            .cloud-indicator { display: none; }
+            .nav-link { padding: 8px 15px; font-size: 0.9rem; white-space: nowrap; margin-right: 5px; }
+            .table-container { padding: 15px !important; }
+            .main-content { padding: 15px !important; }
+            h2 { font-size: 1.5rem; }
+        }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body>
+
+<!-- ===================================== PANTALLA DE LOGIN ===================================== -->
+<div id="loginSection" class="d-flex justify-content-center align-items-center">
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary"><i class="bi bi-lock-fill"></i></h2>
+            <h4 class="fw-bold text-dark">Inspiración Boutique</h4>
+            <p class="text-muted small">Acceso Seguro al Sistema</p>
+        </div>
+        <form onsubmit="iniciarSesion(event)">
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary">Correo Electrónico</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="admin@boutique.com" required>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-secondary">Contraseña</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" id="btnLogin" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">Ingresar al Sistema</button>
+        </form>
+    </div>
+</div>
+
+<!-- ===================================== APLICACIÓN PRINCIPAL (OCULTA INICIALMENTE) ===================================== -->
+<div class="container-fluid" id="mainApp" style="display: none;">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3 shadow">
+            <div>
+                <h4 class="text-center mt-3 mb-1 text-primary fw-bold"><i class="bi bi-cloud-check-fill"></i> Inspiración Boutique</h4>
+                <p class="text-center cloud-indicator mb-4"><i class="bi bi-shield-lock-fill"></i> Sesión Segura</p>
+                
+                <ul class="nav flex-row flex-md-column flex-nowrap overflow-auto pb-1 pb-md-0">
+                    <li class="nav-item mb-md-2"><a id="nav-dashboard" class="nav-link active" onclick="cambiarVista('dashboard', this)"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                    <li class="nav-item mb-md-2"><a id="nav-ventas" class="nav-link" onclick="cambiarVista('ventas', this)"><i class="bi bi-receipt me-2"></i> Ventas</a></li>
+                    <li class="nav-item mb-md-2"><a id="nav-cartera" class="nav-link" onclick="cambiarVista('cartera', this)"><i class="bi bi-wallet2 me-2"></i> Cobros</a></li>
+                    <li class="nav-item mb-md-2"><a id="nav-clientes" class="nav-link" onclick="cambiarVista('clientes', this)"><i class="bi bi-people-fill me-2"></i> Clientes (CRM)</a></li>
+                    <li class="nav-item mb-md-2"><a id="nav-cumpleanos" class="nav-link" onclick="cambiarVista('cumpleanos', this)"><i class="bi bi-gift me-2"></i> Cumpleaños</a></li>
+                </ul>
+            </div>
+            
+            <!-- Botón de Cerrar Sesión en la parte inferior del menú -->
+            <div class="mt-auto pt-4 pb-2 text-center d-none d-md-block">
+                <hr class="border-secondary">
+                <button class="btn btn-outline-danger btn-sm w-100 fw-bold" onclick="cerrarSesion()">
+                    <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 p-4 main-content">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="dashboard" class="section-view active">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <h2 class="fw-bold mb-0 text-dark">Rentabilidad del Negocio</h2>
+                    <div class="d-flex gap-2">
+                        <div class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm">
+                            <label class="fw-bold small text-muted text-nowrap mb-0"><i class="bi bi-calendar-month"></i> Mes:</label>
+                            <input type="month" id="filtroMesDashboard" class="form-control form-control-sm border-0 fw-bold text-primary" style="outline: none; box-shadow: none;" onchange="actualizarDashboard()">
+                        </div>
+                        <!-- Botón cerrar sesión móvil -->
+                        <button class="btn btn-danger d-md-none rounded-circle shadow-sm" onclick="cerrarSesion()"><i class="bi bi-box-arrow-left"></i></button>
+                    </div>
+                </div>
+
+                <div class="row mb-4 g-3">
+                    <div class="col-xl-3 col-md-6 col-12"><div class="card card-kpi shadow-sm border-0 h-100 p-3" style="border-bottom: 4px solid #0d6efd;"><div class="d-flex justify-content-between"><div><h6 class="text-uppercase text-muted small fw-bold mb-1">Ingresos (Ventas)</h6><h3 id="kpi-ingresos" class="text-primary fw-bold mb-0">$ 0</h3></div><div class="bg-primary bg-opacity-10 rounded p-2 text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-cash-stack fs-5"></i></div></div></div></div>
+                    <div class="col-xl-3 col-md-6 col-12"><div class="card card-kpi shadow-sm border-0 h-100 p-3" style="border-bottom: 4px solid #dc3545;"><div class="d-flex justify-content-between"><div><h6 class="text-uppercase text-muted small fw-bold mb-1">Costos Mercancía</h6><h3 id="kpi-costos" class="text-danger fw-bold mb-0">$ 0</h3></div><div class="bg-danger bg-opacity-10 rounded p-2 text-danger d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-box-seam fs-5"></i></div></div></div></div>
+                    <div class="col-xl-3 col-md-6 col-12"><div class="card card-kpi shadow-sm border-0 h-100 p-3" style="border-bottom: 4px solid #198754;"><div class="d-flex justify-content-between"><div><h6 class="text-uppercase text-muted small fw-bold mb-1">Ganancia Neta</h6><h3 id="kpi-ganancias" class="fw-bold mb-0 text-success">$ 0</h3></div><div class="bg-success rounded p-2 d-flex align-items-center justify-content-center bg-opacity-10 text-success" style="width: 40px; height: 40px;"><i class="bi bi-graph-up-arrow fs-5"></i></div></div></div></div>
+                    <div class="col-xl-3 col-md-6 col-12"><div class="card card-kpi shadow-sm border-0 h-100 p-3" style="border-bottom: 4px solid #fd7e14;"><div class="d-flex justify-content-between"><div><h6 class="text-uppercase text-muted small fw-bold mb-1">Cant. de Ventas</h6><h3 id="kpi-cantidad" class="fw-bold mb-0" style="color: #fd7e14;">0</h3></div><div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: rgba(253, 126, 20, 0.1); color: #fd7e14;"><i class="bi bi-bag-check fs-5"></i></div></div></div></div>
+                </div>
+
+                <div class="row mb-4 g-3">
+                    <div class="col-lg-8 col-12">
+                        <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px;">
+                            <h6 class="fw-bold text-muted mb-3"><i class="bi bi-activity me-1"></i> Tendencia Diaria de Ingresos</h6>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="tendenciaChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-12">
+                        <div class="card shadow-sm border-0 h-100 p-4 bg-danger text-white" style="border-radius: 12px; background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%);">
+                            <h6 class="text-uppercase text-white-50 small fw-bold mb-1"><i class="bi bi-wallet2 me-1"></i> Cartera Global</h6>
+                            <p class="small mb-4 text-white-50">Total de dinero pendiente por cobrar en el sistema.</p>
+                            <h1 id="kpi-cartera" class="fw-bold mb-0 display-5 mt-auto">$ 0</h1>
+                            <div class="mt-3"><button class="btn btn-light btn-sm text-danger fw-bold" onclick="cambiarVista('cartera', document.getElementById('nav-cartera'))">Ir a cobrar <i class="bi bi-arrow-right"></i></button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: VENTAS -->
+            <div id="ventas" class="section-view">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h2 class="fw-bold mb-0">Historial de Ventas</h2>
+                    <button class="btn btn-primary px-3 shadow-sm fw-bold" onclick="abrirModalNuevaVenta()">
+                        <i class="bi bi-plus-lg me-1"></i> Nueva Venta
+                    </button>
+                </div>
+                <div class="table-container p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" style="min-width: 800px;">
+                            <thead class="table-light">
+                                <tr><th>Fecha</th><th>Cliente</th><th>Prendas (Detalle)</th><th>Costo</th><th>Total Venta</th><th>Método</th><th class="text-center">Acciones</th></tr>
+                            </thead>
+                            <tbody id="tablaVentasBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CARTERA -->
+            <div id="cartera" class="section-view">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <h2 class="fw-bold mb-0">Control de Cobros</h2>
+                    <div class="d-flex gap-2 w-100 flex-md-nowrap" style="max-width: 400px;">
+                        <input type="text" id="buscadorCartera" class="form-control shadow-sm" placeholder="🔍 Buscar deudor..." onkeyup="filtrarCartera()">
+                        <button class="btn btn-outline-dark fw-bold shadow-sm text-nowrap" onclick="exportarDeudores()"><i class="bi bi-download"></i></button>
+                    </div>
+                </div>
+                <div class="table-container p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" style="min-width: 700px;">
+                            <thead class="table-light">
+                                <tr><th>Cliente</th><th>Créditos Históricos</th><th>Saldo Pendiente Total</th><th>Estado</th><th>Gestión</th></tr>
+                            </thead>
+                            <tbody id="tablaCarteraBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CLIENTES CRM -->
+            <div id="clientes" class="section-view">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h2 class="fw-bold mb-0">Directorio de Clientes</h2>
+                </div>
+                <div class="table-container p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr><th>Nombre del Cliente</th><th>WhatsApp (Llave)</th><th>Total Comprado (Histórico)</th><th>Deuda Actual</th><th>Perfil</th></tr>
+                            </thead>
+                            <tbody id="tablaClientesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CUMPLEAÑOS -->
+            <div id="cumpleanos" class="section-view">
+                <h2 class="fw-bold mb-4">Cumpleaños de este Mes <i class="bi bi-balloon-fill text-danger"></i></h2>
+                <div class="table-container p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr><th>Día</th><th>Cliente</th><th>WhatsApp</th><th>Acción</th></tr>
+                            </thead>
+                            <tbody id="tablaCumpleanosBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<datalist id="listaProductosGenericos">
+    <option value="Blusa Dama"><option value="Camisa Caballero"><option value="Jeans Dama"><option value="Jeans Caballero"><option value="Pantalón Niño"><option value="Vestido Niña"><option value="Conjunto Infantil"><option value="Zapatos Dama"><option value="Zapatos Caballero"><option value="Ropa Interior"><option value="Accesorios / Bisutería">
+</datalist>
+
+<!-- ===================================== MODALES (VENTA, ABONO, PERFIL) ===================================== -->
+<div class="modal fade" id="modalNuevaVenta" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white border-0">
+        <h5 class="modal-title fw-bold" id="tituloModalVenta"><i class="bi bi-cart-plus me-2"></i> Registrar Venta</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 bg-light">
+        <form id="formVenta">
+          <input type="hidden" id="editFirebaseId">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person-circle me-1"></i> Datos del Cliente</h6>
+              <div class="row">
+                <div class="col-md-4 col-12 mb-3 position-relative">
+                    <label class="form-label small fw-bold">Nombre del Cliente *</label>
+                    <input type="text" id="inputCliente" class="form-control" required placeholder="Escribe o selecciona..." list="listaClientesNombres" autocomplete="off">
+                    <datalist id="listaClientesNombres"></datalist>
+                </div>
+                <div class="col-md-4 col-12 mb-3">
+                    <label class="form-label small fw-bold">WhatsApp</label>
+                    <input type="number" id="inputTelefono" class="form-control" placeholder="3001234567">
+                </div>
+                <div class="col-md-4 col-12 mb-3">
+                    <label class="form-label small fw-bold">Fecha Nacimiento</label>
+                    <input type="date" id="inputNacimiento" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold text-primary mb-0"><i class="bi bi-tags me-1"></i> Detalle de Prendas</h6>
+                  <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="agregarFilaArticulo()"><i class="bi bi-plus-circle"></i> Agregar Prenda</button>
+              </div>
+              <div id="contenedorArticulos"></div>
+            </div>
+          </div>
+          <div class="row align-items-end">
+            <div class="col-md-4 col-12 mb-3">
+                <label class="form-label small fw-bold">Método de Pago *</label>
+                <select id="inputMetodo" class="form-select border-primary" style="border-width: 2px;">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Nequi">Nequi / Daviplata</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Crédito (Fiado)">Crédito (Fiado)</option>
+                </select>
+            </div>
+            <div class="col-md-8 col-12 text-md-end text-center mb-3">
+                <div class="d-inline-block bg-white p-3 rounded shadow-sm text-end">
+                    <p class="small text-muted mb-1 text-uppercase fw-bold">Resumen de Factura</p>
+                    <h5 class="mb-1 text-danger small">Costo Total: <span id="resumenCosto">$ 0</span></h5>
+                    <h3 class="mb-0 text-success fw-bold">Total Venta: <span id="resumenVenta">$ 0</span></h3>
+                </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary px-4 fw-bold" id="btnGuardarVenta" onclick="procesarVenta()">Guardar Factura</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalAbono" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-success text-white border-0"><h5 class="modal-title fw-bold">Registrar Abono</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body p-4 text-center">
+        <h6 id="textoClienteAbono" class="fw-bold text-muted mb-1 text-uppercase">---</h6>
+        <h3 id="textoSaldoAbono" class="text-danger fw-bold mb-4">---</h3>
+        <div class="text-start"><label class="form-label small fw-bold">Monto del abono</label><input type="number" id="inputMontoAbono" class="form-control form-control-lg text-center fw-bold"></div>
+        <input type="hidden" id="idVentaAbono">
+      </div>
+      <div class="modal-footer border-0"><button type="button" class="btn btn-light fw-bold" onclick="volverAlPerfil()">Cancelar</button><button type="button" class="btn btn-success w-100 fw-bold py-2" id="btnAplicarAbono" onclick="guardarAbono()">APLICAR PAGO</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalPerfilCliente" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-info text-dark border-0"><h5 class="modal-title fw-bold"><i class="bi bi-person-lines-fill me-2"></i> Perfil del Cliente</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body p-4">
+        <div class="row mb-4">
+            <div class="col-md-6"><h3 id="perfilNombre" class="fw-bold text-primary mb-1">---</h3><p id="perfilContacto" class="text-muted mb-0"><i class="bi bi-whatsapp"></i> ---</p></div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0"><div class="bg-light p-3 rounded d-inline-block shadow-sm"><h6 class="text-muted small text-uppercase fw-bold mb-1">Valor Total en Compras</h6><h4 id="perfilTotalComprado" class="text-success fw-bold mb-0">---</h4></div></div>
+        </div>
+        <div class="table-responsive"><table class="table table-sm align-middle" style="min-width: 800px;"><thead class="table-light"><tr><th>Fecha</th><th>Prendas</th><th>Valor Total</th><th>Método</th><th>Saldo Pendiente</th><th>Abonos</th><th class="text-center">Acción</th></tr></thead><tbody id="perfilListaCompras"></tbody></table></div>
+      </div>
+      <div class="modal-footer border-0"><button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Cerrar Perfil</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================== SCRIPTS FIREBASE ===================================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    // IMPORTANTE: Nuevas librerías de autenticación
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApPs8hF5WWG2dmO22_L-yscjNX5CD8cQM",
+      authDomain: "inspiracionboutique-96047.firebaseapp.com",
+      projectId: "inspiracionboutique-96047",
+      storageBucket: "inspiracionboutique-96047.firebasestorage.app",
+      messagingSenderId: "990906061558",
+      appId: "1:990906061558:web:ee33c056f6fd0e6bb752d7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app); // Inicializamos Autenticación
+    const ventasRef = collection(db, "ventas");
+
+    window.baseVentas = [];
+    window.clientesDirectorio = []; 
+    window.clienteLlaveActiva = ""; 
+    window.chartTendencia = null;
+    let unsubscribeFirestore = null; // Variable para apagar la BD si cerramos sesión
+
+    const modalVenta = new bootstrap.Modal(document.getElementById('modalNuevaVenta'));
+    const modalAbono = new bootstrap.Modal(document.getElementById('modalAbono'));
+    const modalPerfil = new bootstrap.Modal(document.getElementById('modalPerfilCliente'));
+
+    // ================== LÓGICA DE SEGURIDAD (LOGIN/LOGOUT) ==================
+    
+    // Escuchador de estado (Revisa si el usuario está conectado o no)
+    onAuthStateChanged(auth, (user) => {
+        const loginSection = document.getElementById('loginSection');
+        const mainApp = document.getElementById('mainApp');
+
+        if (user) {
+            // Usuario conectado: Oculta login, muestra App, Carga BD
+            loginSection.style.display = 'none';
+            mainApp.style.display = 'block';
+            iniciarBaseDeDatos();
+        } else {
+            // Usuario desconectado: Muestra login, oculta App, Apaga BD
+            loginSection.style.display = 'flex';
+            mainApp.style.display = 'none';
+            if (unsubscribeFirestore) {
+                unsubscribeFirestore(); // Apaga la lectura de datos por seguridad
+            }
+        }
+    });
+
+    window.iniciarSesion = async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPassword').value;
+        const btn = document.getElementById('btnLogin');
+        
+        btn.innerText = 'Validando credenciales...'; 
+        btn.disabled = true;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+            // El onAuthStateChanged detectará el éxito automáticamente
+            document.getElementById('loginPassword').value = ''; // Limpiamos clave por seguridad
+        } catch (error) {
+            alert("Error: Correo o contraseña incorrectos. Verifica en Firebase.");
+            console.error(error);
+        } finally {
+            btn.innerText = 'Ingresar al Sistema'; 
+            btn.disabled = false;
+        }
+    };
+
+    window.cerrarSesion = function() {
+        if(confirm("¿Estás seguro de cerrar la sesión?")) {
+            signOut(auth);
+        }
+    };
+
+    // ================== LÓGICA DE BASE DE DATOS Y APP ==================
+
+    function iniciarBaseDeDatos() {
+        unsubscribeFirestore = onSnapshot(query(ventasRef, orderBy("timestamp", "desc")), (snapshot) => {
+            window.baseVentas = [];
+            snapshot.forEach((documento) => {
+                window.baseVentas.push({ idFirebase: documento.id, ...documento.data() });
+            });
+            render(); 
+        });
+    }
+
+    window.cambiarVista = function(id, link) {
+        document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        link.classList.add('active');
+    };
+
+    window.formatearPrendas = function(articulosObj) {
+        if (!articulosObj) return '-';
+        if (typeof articulosObj === 'string') return articulosObj; 
+        if (Array.isArray(articulosObj)) return articulosObj.map(a => `<span class="badge bg-light text-dark border">${a.cantidad}x ${a.nombre}</span>`).join(' ');
+        return '-';
+    };
+
+    window.textoPlanoPrendas = function(articulosObj) {
+        if (typeof articulosObj === 'string') return articulosObj;
+        if (Array.isArray(articulosObj)) return articulosObj.map(a => `${a.cantidad}x ${a.nombre}`).join(', ');
+        return 'Prendas';
+    };
+
+    window.abrirModalNuevaVenta = function() {
+        document.getElementById('tituloModalVenta').innerHTML = '<i class="bi bi-cart-plus me-2"></i> Registrar Venta';
+        document.getElementById('formVenta').reset();
+        document.getElementById('editFirebaseId').value = "";
+        document.getElementById('contenedorArticulos').innerHTML = "";
+        document.getElementById('resumenCosto').innerText = "$ 0";
+        document.getElementById('resumenVenta').innerText = "$ 0";
+        agregarFilaArticulo(); 
+        modalVenta.show();
+    };
+
+    window.agregarFilaArticulo = function(data = null) {
+        let container = document.getElementById('contenedorArticulos');
+        let div = document.createElement('div');
+        div.className = 'fila-articulo mb-2 shadow-sm';
+        let prod = data ? data.nombre : ''; let cant = data ? data.cantidad : 1;
+        let costo = data ? data.costo : ''; let venta = data ? data.precio : '';
+
+        div.innerHTML = `
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4 col-12"><label class="small text-muted fw-bold">Producto (Escribe o elige)</label><input type="text" class="form-control i-prod" list="listaProductosGenericos" value="${prod}" required placeholder="Ej. Blusa Dama"></div>
+                <div class="col-md-2 col-4"><label class="small text-muted fw-bold">Cant.</label><input type="number" class="form-control text-center i-cant" value="${cant}" min="1" required oninput="calcularTotalesFactura()"></div>
+                <div class="col-md-2 col-4"><label class="small text-muted fw-bold text-danger">Costo Ud. $</label><input type="number" class="form-control text-danger i-costo" value="${costo}" required placeholder="0" oninput="calcularTotalesFactura()"></div>
+                <div class="col-md-3 col-4"><label class="small text-muted fw-bold text-success">Venta Ud. $</label><input type="number" class="form-control text-success fw-bold i-venta" value="${venta}" required placeholder="0" oninput="calcularTotalesFactura()"></div>
+                <div class="col-md-1 col-12 text-end"><button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.parentElement.remove(); calcularTotalesFactura();" title="Eliminar prenda"><i class="bi bi-trash"></i></button></div>
+            </div>
+        `;
+        container.appendChild(div);
+        calcularTotalesFactura();
+    };
+
+    window.calcularTotalesFactura = function() {
+        let totalVenta = 0; let totalCosto = 0;
+        document.querySelectorAll('.fila-articulo').forEach(fila => {
+            let cant = parseFloat(fila.querySelector('.i-cant').value) || 0;
+            let costo = parseFloat(fila.querySelector('.i-costo').value) || 0;
+            let venta = parseFloat(fila.querySelector('.i-venta').value) || 0;
+            totalCosto += (cant * costo); totalVenta += (cant * venta);
+        });
+        document.getElementById('resumenCosto').innerText = "$ " + totalCosto.toLocaleString('es-CO');
+        document.getElementById('resumenVenta').innerText = "$ " + totalVenta.toLocaleString('es-CO');
+    };
+
+    document.getElementById('inputCliente').addEventListener('input', function(e) {
+        let cEncontrado = window.clientesDirectorio.find(c => c.nombre.toLowerCase() === e.target.value.toLowerCase());
+        if(cEncontrado) {
+            if(cEncontrado.telefono) document.getElementById('inputTelefono').value = cEncontrado.telefono;
+            if(cEncontrado.nacimiento) document.getElementById('inputNacimiento').value = cEncontrado.nacimiento;
+        }
+    });
+
+    window.procesarVenta = async function() {
+        let btnGuardar = document.getElementById('btnGuardarVenta');
+        let cliente = document.getElementById('inputCliente').value.trim(); 
+        let idFirebase = document.getElementById('editFirebaseId').value;
+        let articulosArray = []; let totalVenta = 0; let totalCosto = 0;
+
+        document.querySelectorAll('.fila-articulo').forEach(fila => {
+            let nombre = fila.querySelector('.i-prod').value.trim(); let cant = parseFloat(fila.querySelector('.i-cant').value) || 0;
+            let costo = parseFloat(fila.querySelector('.i-costo').value) || 0; let precio = parseFloat(fila.querySelector('.i-venta').value) || 0;
+            if(nombre !== "") { articulosArray.push({ nombre, cantidad: cant, costo, precio }); totalCosto += (cant * costo); totalVenta += (cant * precio); }
+        });
+
+        if(!cliente || articulosArray.length === 0 || totalVenta === 0) return alert("Llena el Nombre y asegúrate de agregar prendas válidas.");
+        btnGuardar.innerText = "Guardando..."; btnGuardar.disabled = true;
+
+        let datos = {
+            cliente: cliente.charAt(0).toUpperCase() + cliente.slice(1).toLowerCase(),
+            telefono: document.getElementById('inputTelefono').value,
+            nacimiento: document.getElementById('inputNacimiento').value, 
+            articulos: articulosArray, costoTotal: totalCosto, ganancia: totalVenta - totalCosto,
+            total: totalVenta, metodo: document.getElementById('inputMetodo').value,
+        };
+
+        try {
+            if(idFirebase !== "") await updateDoc(doc(db, "ventas", idFirebase), datos);
+            else { datos.fecha = new Date().toLocaleDateString('es-CO'); datos.totalAbonado = 0; datos.historialAbonos = []; datos.timestamp = Date.now(); await addDoc(ventasRef, datos); }
+            modalVenta.hide();
+        } catch (error) { alert("Error: " + error.message); } 
+        finally { btnGuardar.innerText = "Guardar Factura"; btnGuardar.disabled = false; }
+    };
+
+    window.editarVenta = function(idFirebase) {
+        let v = window.baseVentas.find(v => v.idFirebase === idFirebase);
+        document.getElementById('tituloModalVenta').innerHTML = '<i class="bi bi-pencil-square me-2"></i> Editar Venta';
+        document.getElementById('inputCliente').value = v.cliente; document.getElementById('inputTelefono').value = v.telefono || '';
+        document.getElementById('inputNacimiento').value = v.nacimiento || ''; document.getElementById('inputMetodo').value = v.metodo;
+        document.getElementById('editFirebaseId').value = v.idFirebase;
+        document.getElementById('contenedorArticulos').innerHTML = "";
+        if(typeof v.articulos === 'string') agregarFilaArticulo({ nombre: v.articulos, cantidad: 1, costo: v.costoTotal || 0, precio: v.total });
+        else if (Array.isArray(v.articulos)) v.articulos.forEach(art => agregarFilaArticulo(art));
+        calcularTotalesFactura(); modalVenta.show();
+    };
+
+    window.eliminarVenta = async function(idFirebase) {
+        let v = window.baseVentas.find(v => v.idFirebase === idFirebase);
+        if (confirm(`¿Estás seguro de eliminar la venta de ${v.cliente}?`)) await deleteDoc(doc(db, "ventas", idFirebase));
+    };
+
+    window.abrirAbono = function(idFirebase) {
+        modalPerfil.hide(); let v = window.baseVentas.find(v => v.idFirebase === idFirebase);
+        document.getElementById('textoClienteAbono').innerText = v.cliente + " (" + textoPlanoPrendas(v.articulos) + ")";
+        document.getElementById('textoSaldoAbono').innerText = "$ " + (v.total - v.totalAbonado).toLocaleString('es-CO');
+        document.getElementById('idVentaAbono').value = idFirebase; document.getElementById('inputMontoAbono').value = "";
+        modalAbono.show();
+    };
+
+    window.volverAlPerfil = function() { modalAbono.hide(); setTimeout(() => { modalPerfil.show(); }, 300); }
+
+    window.guardarAbono = async function() {
+        let btn = document.getElementById('btnAplicarAbono'); let idFirebase = document.getElementById('idVentaAbono').value;
+        let monto = parseFloat(document.getElementById('inputMontoAbono').value); let v = window.baseVentas.find(v => v.idFirebase === idFirebase);
+        if(monto > 0) {
+            btn.innerText = "Procesando..."; btn.disabled = true; let historialActual = v.historialAbonos || [];
+            historialActual.push({ fecha: new Date().toLocaleDateString('es-CO'), monto: monto });
+            try { await updateDoc(doc(db, "ventas", idFirebase), { totalAbonado: v.totalAbonado + monto, historialAbonos: historialActual });
+                modalAbono.hide(); setTimeout(() => { abrirPerfilCliente(window.clienteLlaveActiva); }, 300);
+            } catch(e) { alert("Error: " + e.message); } finally { btn.innerText = "APLICAR PAGO"; btn.disabled = false; }
+        }
+    };
+
+    window.abrirPerfilCliente = function(llaveCliente) {
+        window.clienteLlaveActiva = llaveCliente; 
+        let compras = window.baseVentas.filter(v => (v.telefono ? v.telefono.toString().trim() : v.cliente.toLowerCase()) === llaveCliente);
+        let info = compras[0]; let totalAcumulado = 0;
+        document.getElementById('perfilNombre').innerText = info.cliente;
+        document.getElementById('perfilContacto').innerHTML = info.telefono ? `<i class="bi bi-whatsapp text-success me-1"></i> ${info.telefono}` : 'Sin WhatsApp registrado';
+        let tabla = document.getElementById('perfilListaCompras'); tabla.innerHTML = "";
+
+        compras.forEach(compra => {
+            totalAcumulado += compra.total; let badge = compra.metodo.includes('Crédito') ? 'bg-warning text-dark' : 'bg-success';
+            let saldoDeEstaCompra = compra.total - (compra.totalAbonado || 0); let textoSaldo = "-"; let claseSaldo = "";
+            let btnAbonarHtml = `<span class="text-muted small">Contado</span>`;
+
+            if(compra.metodo.includes('Crédito')) {
+                if(saldoDeEstaCompra > 0) { textoSaldo = `$ ${saldoDeEstaCompra.toLocaleString('es-CO')}`; claseSaldo = "text-danger fw-bold"; btnAbonarHtml = `<button class="btn btn-sm btn-primary w-100 shadow-sm" onclick="abrirAbono('${compra.idFirebase}')"><i class="bi bi-currency-dollar"></i> Abonar</button>`; } 
+                else { textoSaldo = `<i class="bi bi-check-circle-fill"></i> Pagado`; claseSaldo = "text-success fw-bold"; btnAbonarHtml = `<span class="text-success small fw-bold"><i class="bi bi-check-all"></i> Cancelado</span>`; }
+            }
+
+            let htmlAbonos = '<span class="text-muted small">-</span>';
+            if (compra.historialAbonos && compra.historialAbonos.length > 0) {
+                htmlAbonos = '<ul class="list-unstyled mb-0 small">';
+                compra.historialAbonos.forEach(abono => { htmlAbonos += `<li><i class="bi bi-check2 text-success"></i> ${abono.fecha}: <strong class="text-dark">$${abono.monto.toLocaleString('es-CO')}</strong></li>`; });
+                htmlAbonos += '</ul>';
+            }
+
+            tabla.innerHTML += `<tr><td class="text-muted small">${compra.fecha}</td><td class="small">${formatearPrendas(compra.articulos)}</td><td class="fw-bold">$ ${compra.total.toLocaleString('es-CO')}</td><td><span class="badge ${badge} px-2 py-1">${compra.metodo}</span></td><td class="${claseSaldo}">${textoSaldo}</td><td>${htmlAbonos}</td><td class="text-center">${btnAbonarHtml}</td></tr>`;
+        });
+        document.getElementById('perfilTotalComprado').innerText = "$ " + totalAcumulado.toLocaleString('es-CO'); modalPerfil.show();
+    };
+
+    window.actualizarDashboard = function() {
+        let filtroMesVal = document.getElementById('filtroMesDashboard').value; let añoFiltro, mesFiltro;
+        if (filtroMesVal) { let partes = filtroMesVal.split('-'); añoFiltro = parseInt(partes[0]); mesFiltro = parseInt(partes[1]) - 1; } 
+        else { let hoyDate = new Date(); añoFiltro = hoyDate.getFullYear(); mesFiltro = hoyDate.getMonth(); document.getElementById('filtroMesDashboard').value = `${añoFiltro}-${(mesFiltro + 1).toString().padStart(2, '0')}`; }
+
+        let sumaMes = 0; let costosMes = 0; let gananciasMes = 0; let cantidadVentas = 0; let carteraGlobal = 0; let ventasAgrupadasDiarias = {};
+        let diasEnMes = new Date(añoFiltro, mesFiltro + 1, 0).getDate();
+        for(let i=1; i<=diasEnMes; i++) { ventasAgrupadasDiarias[i] = 0; }
+
+        window.baseVentas.forEach(v => {
+            if(v.metodo.includes('Crédito')) carteraGlobal += (v.total - (v.totalAbonado || 0));
+            let fechaVenta = new Date(v.timestamp || Date.now()); 
+            if (fechaVenta.getFullYear() === añoFiltro && fechaVenta.getMonth() === mesFiltro) {
+                sumaMes += v.total; costosMes += (v.costoTotal || 0); gananciasMes += (v.ganancia !== undefined ? v.ganancia : v.total);
+                cantidadVentas++; ventasAgrupadasDiarias[fechaVenta.getDate()] += v.total;
+            }
+        });
+
+        document.getElementById('kpi-ingresos').innerText = "$ " + sumaMes.toLocaleString('es-CO'); document.getElementById('kpi-costos').innerText = "$ " + costosMes.toLocaleString('es-CO');
+        document.getElementById('kpi-ganancias').innerText = "$ " + gananciasMes.toLocaleString('es-CO'); document.getElementById('kpi-cantidad').innerText = cantidadVentas;
+        document.getElementById('kpi-cartera').innerText = "$ " + carteraGlobal.toLocaleString('es-CO');
+
+        if (window.chartTendencia) window.chartTendencia.destroy(); 
+        window.chartTendencia = new Chart(document.getElementById('tendenciaChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(ventasAgrupadasDiarias), datasets: [{ data: Object.values(ventasAgrupadasDiarias), borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#0d6efd', pointRadius: 3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return ' $' + c.raw.toLocaleString('es-CO'); } } } } } });
+    };
+
+    window.filtrarCartera = function() {
+        let filtro = document.getElementById('buscadorCartera').value.toLowerCase();
+        document.querySelectorAll('#tablaCarteraBody tr').forEach(f => f.style.display = f.cells[0].innerText.toLowerCase().includes(filtro) ? '' : 'none');
+    };
+
+    function render() {
+        const tVentas = document.getElementById('tablaVentasBody'); const tCart = document.getElementById('tablaCarteraBody');
+        const tCumples = document.getElementById('tablaCumpleanosBody'); const tClientes = document.getElementById('tablaClientesBody'); 
+        const datalist = document.getElementById('listaClientesNombres');
+        tVentas.innerHTML = ""; tCart.innerHTML = ""; tCumples.innerHTML = ""; tClientes.innerHTML = ""; datalist.innerHTML = "";
+
+        let mesActual = new Date().getMonth() + 1; let cumpleaneros = []; let clientesCRM = {}; window.clientesDirectorio = []; 
+
+        window.baseVentas.forEach(v => {
+            let saldo = v.total - v.totalAbonado; let badge = v.metodo.includes('Crédito') ? 'bg-warning text-dark' : 'bg-success';
+            tVentas.innerHTML += `<tr><td>${v.fecha}</td><td><span class="fw-bold">${v.cliente}</span><br><small class="text-muted">${v.telefono || ''}</small></td><td>${formatearPrendas(v.articulos)}</td><td class="text-danger small">$ ${(v.costoTotal || 0).toLocaleString('es-CO')}</td><td class="fw-bold text-success">$ ${v.total.toLocaleString('es-CO')}</td><td><span class="badge ${badge}">${v.metodo}</span></td><td class="text-center"><div class="d-flex justify-content-center"><button class="btn btn-sm btn-outline-primary border-0 me-1" onclick="editarVenta('${v.idFirebase}')"><i class="bi bi-pencil-fill"></i></button><button class="btn btn-sm btn-outline-danger border-0" onclick="eliminarVenta('${v.idFirebase}')"><i class="bi bi-trash-fill"></i></button></div></td></tr>`;
+
+            let llave = v.telefono ? v.telefono.toString().trim() : v.cliente.toLowerCase();
+            if(!clientesCRM[llave]) {
+                clientesCRM[llave] = { llave: llave, nombre: v.cliente, telefono: v.telefono, totalAcumulado: 0, totalCreditos: 0, deudaTotal: 0, prendasPendientes: [] };
+                window.clientesDirectorio.push({ nombre: v.cliente, telefono: v.telefono, nacimiento: v.nacimiento });
+                let opt = document.createElement('option'); opt.value = v.cliente; datalist.appendChild(opt);
+            }
+            clientesCRM[llave].totalAcumulado += v.total;
+            if(v.metodo.includes('Crédito')) {
+                clientesCRM[llave].totalCreditos += v.total; clientesCRM[llave].deudaTotal += saldo;
+                if(saldo > 0) clientesCRM[llave].prendasPendientes.push({ descripcion: textoPlanoPrendas(v.articulos), saldoDePrenda: saldo });
+            }
+            if(v.nacimiento && v.nacimiento.split('-').length === 3 && parseInt(v.nacimiento.split('-')[1]) === mesActual) {
+                if(!cumpleaneros.find(c => c.cliente === v.cliente)) cumpleaneros.push({ dia: parseInt(v.nacimiento.split('-')[2]), cliente: v.cliente, telefono: v.telefono });
+            }
+        });
+
+        Object.values(clientesCRM).forEach(c => {
+            tClientes.innerHTML += `<tr><td class="fw-bold">${c.nombre}</td><td>${c.telefono ? `<i class="bi bi-whatsapp text-success"></i> ${c.telefono}` : '-'}</td><td class="fw-bold text-primary">$ ${c.totalAcumulado.toLocaleString('es-CO')}</td><td class="${c.deudaTotal > 0 ? 'text-danger fw-bold' : 'text-success'}">${c.deudaTotal > 0 ? `$ ${c.deudaTotal.toLocaleString('es-CO')}` : 'Sin deuda'}</td><td><button class="btn btn-sm btn-info text-white fw-bold shadow-sm" onclick="abrirPerfilCliente('${c.llave}')"><i class="bi bi-eye"></i> Ver Perfil</button></td></tr>`;
+            if(c.deudaTotal > 0) {
+                let msjAgrupado = encodeURIComponent(`Hola ${c.nombre}, te saludamos de Inspiración Boutique. 🛍️\n\nTienes un saldo pendiente de *$${c.deudaTotal.toLocaleString('es-CO')}*.\n\n*Detalle:*\n`) + c.prendasPendientes.map(p => `▫️ ${p.descripcion} (Saldo: $${p.saldoDePrenda.toLocaleString('es-CO')})`).join('%0A') + encodeURIComponent(`\n\n¿Cuándo podrías pasar a realizar un abono? ¡Gracias!`);
+                tCart.innerHTML += `<tr><td><span class="fw-bold">${c.nombre}</span><br><small class="text-muted">${c.telefono || ''}</small></td><td class="fw-bold">$ ${c.totalCreditos.toLocaleString('es-CO')}</td><td class="text-danger fw-bold fs-6">$ ${c.deudaTotal.toLocaleString('es-CO')}</td><td><span class="badge bg-danger">PENDIENTE</span></td><td><div class="d-flex flex-nowrap">${c.telefono ? `<a href="https://wa.me/57${c.telefono}?text=${msjAgrupado}" target="_blank" class="btn btn-sm btn-success me-2 shadow-sm"><i class="bi bi-whatsapp"></i></a>` : ''}<button class="btn btn-sm btn-primary shadow-sm" onclick="abrirPerfilCliente('${c.llave}')"><i class="bi bi-list-check"></i> Ver / Abonar</button></div></td></tr>`;
+            }
+        });
+
+        if(cumpleaneros.length > 0) {
+            cumpleaneros.sort((a, b) => a.dia - b.dia).forEach(c => {
+                let msjCumple = encodeURIComponent(`¡Hola ${c.cliente}! 🎉 En Inspiración Boutique queremos desearte un muy feliz cumpleaños. ¡Que tengas un día espectacular! 🎂`);
+                tCumples.innerHTML += `<tr><td><span class="badge bg-danger fs-6 rounded-circle p-2">${c.dia}</span></td><td class="fw-bold">${c.cliente}</td><td>${c.telefono || '-'}</td><td>${c.telefono ? `<a href="https://wa.me/57${c.telefono}?text=${msjCumple}" target="_blank" class="btn btn-sm btn-success shadow-sm"><i class="bi bi-whatsapp me-1"></i> Felicitar</a>` : '<span class="text-muted small">Sin WhatsApp</span>'}</td></tr>`;
+            });
+        } else tCumples.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">No hay cumpleaños este mes.</td></tr>`;
+        actualizarDashboard(); 
+    }
+</script>
+</body>
+</html>
