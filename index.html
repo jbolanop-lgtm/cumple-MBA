@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario MBA IUB - Conectado</title>
+    <title>Calendario MBA IUB - Final</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;700&display=swap');
 
@@ -26,7 +26,7 @@
 
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* PANEL DE PRÓXIMO CUMPLEAÑOS */
+        /* PANEL SUPERIOR */
         .next-birthday-panel {
             background: linear-gradient(135deg, var(--navy-light) 0%, #051121 100%);
             border: 1px solid var(--gold);
@@ -45,6 +45,16 @@
             font-size: 2.5rem;
             color: var(--gold-light);
             margin: 10px 0;
+        }
+
+        .stats-badge {
+            background: rgba(201,153,42,0.15);
+            border: 1px solid var(--gold);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--gold-light);
+            margin-bottom: 10px;
         }
 
         /* CALENDARIO */
@@ -89,7 +99,7 @@
             width: 35px; height: 35px; border-radius: 50%;
             background: var(--gold); color: var(--navy);
             display: flex; align-items: center; justify-content: center;
-            font-weight: bold; margin-right: 12px;
+            font-weight: bold; margin-right: 12px; font-size: 0.8rem;
         }
 
         .actions { display: flex; gap: 8px; margin-left: auto; }
@@ -114,6 +124,7 @@
         .btn-primary {
             background: var(--gold); border: none; padding: 12px;
             width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer;
+            color: var(--navy);
         }
 
         input, select {
@@ -127,20 +138,21 @@
 
 <div class="container">
     <div class="next-birthday-panel">
-        <span style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; color: var(--gold);">Próximo Cumpleaños</span>
-        <div id="countdown">Conectando a la nube...</div>
-        <div id="nextPersonName" style="font-weight: bold; font-size: 1.2rem;">---</div>
+        <div class="stats-badge" id="totalCompaneros">Registrados: 0 compañeros</div>
+        <span style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; color: var(--gold);">Próximo Cumpleaños</span>
+        <div id="countdown">Conectando...</div>
+        <div id="nextPersonName" style="font-weight: bold; font-size: 1.1rem;">---</div>
     </div>
 
     <div class="cal-header">
         <div>
             <h1 style="font-family:'Playfair Display'; margin:0; color: var(--gold-light);">Calendario MBA</h1>
-            <p style="margin:0; opacity:0.6; font-size:0.9rem;">IUB · Barranquilla 2026</p>
+            <p style="margin:0; opacity:0.6; font-size:0.8rem;">IUB · Barranquilla 2026</p>
         </div>
         <button class="btn-primary" style="width:auto; padding: 10px 20px;" onclick="openModal()">+ Agregar</button>
     </div>
 
-    <div class="cal-grid" id="calendarGrid"></div>
+    <div id="calendarGrid" class="cal-grid"></div>
 </div>
 
 <div class="modal" id="formModal">
@@ -158,7 +170,7 @@
         </select>
         <input type="number" id="day" placeholder="Día" min="1" max="31">
         <button class="btn-primary" id="btnSave" onclick="saveData()">Guardar Datos</button>
-        <button onclick="closeModal()" style="background:none; border:none; color:gray; width:100%; margin-top:15px; cursor:pointer;">Cancelar</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:gray; width:100%; margin-top:15px; cursor:pointer;">Cerrar</button>
     </div>
 </div>
 
@@ -167,7 +179,6 @@
     import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Tu configuración oficial de Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDmk2mpWvlR8NbZicA7alTh7XFZw1KCtjA",
         authDomain: "cumple-mba.firebaseapp.com",
@@ -196,11 +207,17 @@
         initGrid();
         let bdays = [];
         snapshot.forEach(d => {
-            const data = {...d.data(), id: d.id};
-            bdays.push(data);
-            renderPerson(data);
+            bdays.push({...d.data(), id: d.id});
         });
+
+        // Ordenar ascendente por día
+        bdays.sort((a, b) => a.day - b.day);
+
+        bdays.forEach(data => renderPerson(data));
         updateCountdown(bdays);
+        
+        // Actualizar contador superior
+        document.getElementById('totalCompaneros').innerText = `Registrados: ${bdays.length} compañeros`;
     });
 
     function renderPerson(data) {
@@ -212,8 +229,8 @@
         div.innerHTML = `
             <div class="avatar">${initials}</div>
             <div style="flex:1">
-                <div style="font-size:0.9rem; font-weight:500;">${data.name}</div>
-                <div style="font-size:0.75rem; color:var(--gold)">${data.day} de ${months[data.month]}</div>
+                <div style="font-size:0.85rem; font-weight:500;">${data.name}</div>
+                <div style="font-size:0.7rem; color:var(--gold)">${data.day} de ${months[data.month]}</div>
             </div>
             <div class="actions">
                 <button class="btn-icon btn-edit" onclick="editEntry('${data.id}', '${data.name}', ${data.month}, ${data.day})">✎</button>
@@ -256,14 +273,14 @@
         btn.disabled = true; btn.innerText = "Guardando...";
 
         try {
-            if (id) { await updateDoc(doc(db, "cumpleaños", id), { name, month, day }); alert("¡Actualizado!"); }
-            else { await addDoc(colRef, { name, month, day }); alert("¡Guardado exitosamente!"); }
+            if (id) { await updateDoc(doc(db, "cumpleaños", id), { name, month, day }); alert("¡Actualizado! ✅"); }
+            else { await addDoc(colRef, { name, month, day }); alert("¡Guardado! ✅"); }
             closeModal();
         } catch (e) { alert("Error: " + e.message); }
         finally { btn.disabled = false; btn.innerText = "Guardar Datos"; }
     };
 
-    window.deleteEntry = async (id) => { if(confirm("¿Borrar compañero?")) await deleteDoc(doc(db, "cumpleaños", id)); };
+    window.deleteEntry = async (id) => { if(confirm("¿Eliminar compañero?")) await deleteDoc(doc(db, "cumpleaños", id)); };
     window.editEntry = (id, n, m, d) => {
         document.getElementById('editId').value = id;
         document.getElementById('name').value = n;
