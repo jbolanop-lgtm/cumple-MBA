@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario MBA IUB - Final</title>
+    <title>Dashboard MBA - Calendario IUB</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;700&display=swap');
 
@@ -14,6 +14,7 @@
             --gold-light: #F0C96A;
             --danger: #ff4d4d;
             --glass: rgba(255, 255, 255, 0.05);
+            --success: #2ecc71;
         }
 
         body { 
@@ -24,140 +25,111 @@
             padding: 20px;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        /* PANEL SUPERIOR */
-        .next-birthday-panel {
-            background: linear-gradient(135deg, var(--navy-light) 0%, #051121 100%);
-            border: 1px solid var(--gold);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        #countdown {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            color: var(--gold-light);
-            margin: 10px 0;
-        }
-
-        .stats-badge {
-            background: rgba(201,153,42,0.15);
-            border: 1px solid var(--gold);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: var(--gold-light);
-            margin-bottom: 10px;
-        }
-
-        /* CALENDARIO */
-        .cal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .cal-grid {
+        /* DASHBOARD WIDGETS */
+        .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .month-card {
-            background: var(--navy);
+        .widget {
+            background: linear-gradient(135deg, var(--navy-light) 0%, #051121 100%);
+            border: 1px solid rgba(201, 153, 42, 0.3);
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .month-name {
-            font-family: 'Playfair Display', serif;
-            color: var(--gold-light);
-            border-bottom: 1px solid var(--gold);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .widget-main { grid-column: span 2; border: 1px solid var(--gold); }
+
+        .widget h3 { 
+            margin: 0; font-size: 0.7rem; text-transform: uppercase; 
+            letter-spacing: 1.5px; color: var(--gold); opacity: 0.8;
         }
 
-        .person-row {
-            display: flex;
-            align-items: center;
-            background: var(--glass);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+        .widget .val { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.8rem; color: var(--gold-light); margin: 5px 0;
         }
 
-        .avatar {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: var(--gold); color: var(--navy);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; margin-right: 12px; font-size: 0.8rem;
+        .widget .sub { font-size: 0.75rem; opacity: 0.6; }
+
+        #countdown { font-size: 2.2rem !important; }
+
+        .birthday-today { border-color: var(--success) !important; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
 
-        .actions { display: flex; gap: 8px; margin-left: auto; }
-
-        .btn-icon { background: none; border: none; cursor: pointer; font-size: 14px; padding: 5px; }
+        /* CALENDARIO ESTILOS */
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .month-card { background: var(--navy); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .month-name { font-family: 'Playfair Display', serif; color: var(--gold-light); border-bottom: 1px solid var(--gold); padding-bottom: 8px; margin-bottom: 12px; font-size: 1.1rem; }
+        
+        .person-row { display: flex; align-items: center; background: var(--glass); padding: 8px; border-radius: 8px; margin-bottom: 8px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--navy); display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; font-size: 0.75rem; }
+        .actions { display: flex; gap: 5px; margin-left: auto; }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 12px; padding: 4px; }
         .btn-edit { color: var(--gold-light); }
         .btn-delete { color: var(--danger); }
 
         /* MODAL */
-        .modal {
-            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-            z-index: 1000; justify-content: center; align-items: center;
-        }
-
-        .modal-content {
-            background: var(--navy-light); padding: 30px;
-            border-radius: 15px; width: 350px; border: 1px solid var(--gold);
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: var(--gold); border: none; padding: 12px;
-            width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer;
-            color: var(--navy);
-        }
-
-        input, select {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            background: #051121; border: 1px solid var(--gold);
-            color: white; border-radius: 6px; box-sizing: border-box;
-        }
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--navy-light); padding: 30px; border-radius: 15px; width: 350px; border: 1px solid var(--gold); text-align: center; }
+        .btn-primary { background: var(--gold); border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--navy); }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; background: #051121; border: 1px solid var(--gold); color: white; border-radius: 6px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="next-birthday-panel">
-        <div class="stats-badge" id="totalCompaneros">Registrados: 0 compañeros</div>
-        <span style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; color: var(--gold);">Próximo Cumpleaños</span>
-        <div id="countdown">Conectando...</div>
-        <div id="nextPersonName" style="font-weight: bold; font-size: 1.1rem;">---</div>
+    <!-- DASHBOARD SUPERIOR -->
+    <div class="dashboard">
+        <div class="widget">
+            <h3>Total Grupo</h3>
+            <div class="val" id="countTotal">0</div>
+            <div class="sub">Compañeros MBA</div>
+        </div>
+        <div class="widget-main widget">
+            <h3 id="nextLabel">Próximo Cumpleaños</h3>
+            <div class="val" id="countdown">--d --h --m --s</div>
+            <div class="sub" id="nextPersonName">Cargando eventos...</div>
+        </div>
+        <div class="widget">
+            <h3>Mes Actual</h3>
+            <div class="val" id="countMonth">0</div>
+            <div class="sub" id="currentMonthName">--</div>
+        </div>
+        <div class="widget" id="todayWidget">
+            <h3>Hoy</h3>
+            <div class="val" id="todayName" style="font-size: 1.2rem; margin: 15px 0;">Nadie cumple hoy</div>
+            <div class="sub">¡Felicítalos! 🥳</div>
+        </div>
     </div>
 
     <div class="cal-header">
         <div>
-            <h1 style="font-family:'Playfair Display'; margin:0; color: var(--gold-light);">Calendario MBA</h1>
-            <p style="margin:0; opacity:0.6; font-size:0.8rem;">IUB · Barranquilla 2026</p>
+            <h1 style="font-family:'Playfair Display'; margin:0; color: var(--gold-light);">Calendario de Cumpleaños</h1>
+            <p style="margin:0; opacity:0.6; font-size:0.8rem;">IUB · Maestría en Administración · 2026</p>
         </div>
-        <button class="btn-primary" style="width:auto; padding: 10px 20px;" onclick="openModal()">+ Agregar</button>
+        <button class="btn-primary" style="width:auto; padding: 10px 20px;" onclick="openModal()">+ Agregar Registro</button>
     </div>
 
     <div id="calendarGrid" class="cal-grid"></div>
 </div>
 
+<!-- Modal -->
 <div class="modal" id="formModal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="color:var(--gold-light); margin-top: 0;">Registro</h2>
+        <h2 id="modalTitle" style="color:var(--gold-light); margin-top: 0;">Gestionar Compañero</h2>
         <input type="hidden" id="editId">
         <input type="text" id="name" placeholder="Nombre completo">
         <select id="month">
@@ -206,18 +178,14 @@
     onSnapshot(colRef, (snapshot) => {
         initGrid();
         let bdays = [];
-        snapshot.forEach(d => {
-            bdays.push({...d.data(), id: d.id});
-        });
+        snapshot.forEach(d => { bdays.push({...d.data(), id: d.id}); });
 
-        // Ordenar ascendente por día
+        // Ordenar y renderizar
         bdays.sort((a, b) => a.day - b.day);
-
         bdays.forEach(data => renderPerson(data));
-        updateCountdown(bdays);
         
-        // Actualizar contador superior
-        document.getElementById('totalCompaneros').innerText = `Registrados: ${bdays.length} compañeros`;
+        // Actualizar Dashboard
+        updateDashboard(bdays);
     });
 
     function renderPerson(data) {
@@ -229,8 +197,8 @@
         div.innerHTML = `
             <div class="avatar">${initials}</div>
             <div style="flex:1">
-                <div style="font-size:0.85rem; font-weight:500;">${data.name}</div>
-                <div style="font-size:0.7rem; color:var(--gold)">${data.day} de ${months[data.month]}</div>
+                <div style="font-size:0.8rem; font-weight:500;">${data.name}</div>
+                <div style="font-size:0.65rem; color:var(--gold)">${data.day} de ${months[data.month]}</div>
             </div>
             <div class="actions">
                 <button class="btn-icon btn-edit" onclick="editEntry('${data.id}', '${data.name}', ${data.month}, ${data.day})">✎</button>
@@ -239,19 +207,50 @@
         list.appendChild(div);
     }
 
-    function updateCountdown(bdays) {
-        if (bdays.length === 0) { document.getElementById('countdown').innerText = "Sin fechas"; return; }
+    function updateDashboard(bdays) {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentDate = now.getDate();
+
+        // 1. Total
+        document.getElementById('countTotal').innerText = bdays.length;
+
+        // 2. Mes Actual
+        document.getElementById('currentMonthName').innerText = `Cumpleaños en ${months[currentMonth]}`;
+        const mesCount = bdays.filter(b => b.month === currentMonth).length;
+        document.getElementById('countMonth').innerText = mesCount;
+
+        // 3. Hoy
+        const cumplenHoy = bdays.filter(b => b.month === currentMonth && b.day === currentDate);
+        const todayWidget = document.getElementById('todayWidget');
+        if(cumplenHoy.length > 0) {
+            document.getElementById('todayName').innerText = cumplenHoy.map(b => b.name).join(', ');
+            todayWidget.classList.add('birthday-today');
+        } else {
+            document.getElementById('todayName').innerText = "Nadie cumple hoy";
+            todayWidget.classList.remove('birthday-today');
+        }
+
+        // 4. Countdown
+        if (bdays.length === 0) return;
         if(timerInterval) clearInterval(timerInterval);
+        
         const calc = () => {
-            const now = new Date();
+            const timeNow = new Date();
             let next = bdays.map(b => {
-                let d = new Date(now.getFullYear(), b.month, b.day);
-                if (d < now) d.setFullYear(now.getFullYear() + 1);
+                let d = new Date(timeNow.getFullYear(), b.month, b.day);
+                if (d < timeNow && !(d.getMonth() === timeNow.getMonth() && d.getDate() === timeNow.getDate())) {
+                    d.setFullYear(timeNow.getFullYear() + 1);
+                }
                 return { ...b, full: d };
             }).sort((a, b) => a.full - b.full)[0];
 
             document.getElementById('nextPersonName').innerText = `Es el cumpleaños de ${next.name}`;
             const diff = next.full - new Date();
+            if(diff <= 0) {
+                document.getElementById('countdown').innerText = "¡FELIZ CUMPLEAÑOS!";
+                return;
+            }
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
             const mins = Math.floor((diff / 1000 / 60) % 60);
@@ -262,6 +261,7 @@
         timerInterval = setInterval(calc, 1000);
     }
 
+    // --- ACCIONES FORMULARIO ---
     window.saveData = async () => {
         const id = document.getElementById('editId').value;
         const name = document.getElementById('name').value.trim();
@@ -270,17 +270,17 @@
 
         if (!name || !day) return alert("Completa los datos");
         const btn = document.getElementById('btnSave');
-        btn.disabled = true; btn.innerText = "Guardando...";
+        btn.disabled = true; btn.innerText = "Procesando...";
 
         try {
-            if (id) { await updateDoc(doc(db, "cumpleaños", id), { name, month, day }); alert("¡Actualizado! ✅"); }
-            else { await addDoc(colRef, { name, month, day }); alert("¡Guardado! ✅"); }
+            if (id) { await updateDoc(doc(db, "cumpleaños", id), { name, month, day }); }
+            else { await addDoc(colRef, { name, month, day }); }
             closeModal();
         } catch (e) { alert("Error: " + e.message); }
         finally { btn.disabled = false; btn.innerText = "Guardar Datos"; }
     };
 
-    window.deleteEntry = async (id) => { if(confirm("¿Eliminar compañero?")) await deleteDoc(doc(db, "cumpleaños", id)); };
+    window.deleteEntry = async (id) => { if(confirm("¿Eliminar registro?")) await deleteDoc(doc(db, "cumpleaños", id)); };
     window.editEntry = (id, n, m, d) => {
         document.getElementById('editId').value = id;
         document.getElementById('name').value = n;
