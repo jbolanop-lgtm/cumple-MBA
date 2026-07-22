@@ -4,448 +4,297 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard MBA - Calendario IUB</title>
-    <!-- Bootstrap v5.0 CSS -->
-    <link href="https://cdn.jsdelivr.com/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.com/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;700&display=swap');
+
         :root {
-            --bg-dark: #051121;
-            --navy-card: #0B1F3A;
+            --navy: #0B1F3A;
             --navy-light: #1A3358;
             --gold: #C9992A;
             --gold-light: #F0C96A;
+            --danger: #ff4d4d;
+            --glass: rgba(255, 255, 255, 0.05);
+            --success: #2ecc71;
         }
 
         body { 
-            background-color: var(--bg-dark); 
-            color: #ffffff; 
+            background: #051121; 
+            color: white; 
             font-family: 'DM Sans', sans-serif; 
+            margin: 0; 
+            padding: 20px;
         }
 
-        .font-playfair { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        /* Navbar Custom */
-        .navbar-custom {
-            background: linear-gradient(135deg, var(--navy-card) 0%, var(--navy-light) 100%);
-            border-bottom: 2px solid var(--gold);
+        /* DASHBOARD WIDGETS */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        /* Widgets Dashboard */
-        .widget-card {
-            background: linear-gradient(135deg, var(--navy-light) 0%, var(--bg-dark) 100%);
+        .widget {
+            background: linear-gradient(135deg, var(--navy-light) 0%, #051121 100%);
             border: 1px solid rgba(201, 153, 42, 0.3);
             border-radius: 12px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .widget-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .widget-main {
-            border: 1px solid var(--gold);
+        .widget-main { grid-column: span 2; border: 1px solid var(--gold); }
+
+        .widget h3 { 
+            margin: 0; font-size: 0.7rem; text-transform: uppercase; 
+            letter-spacing: 1.5px; color: var(--gold); opacity: 0.8;
         }
 
-        .widget-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--gold);
+        .widget .val { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.8rem; color: var(--gold-light); margin: 5px 0;
         }
 
-        .widget-value {
-            font-size: 1.8rem;
-            color: var(--gold-light);
-        }
+        .widget .sub { font-size: 0.75rem; opacity: 0.6; }
 
-        /* Month Cards */
-        .card-month {
-            background-color: var(--navy-card);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            min-height: 180px;
-        }
-        .card-month-title {
-            color: var(--gold-light);
-            border-bottom: 1px solid rgba(201, 153, 42, 0.4);
-            padding-bottom: 8px;
-        }
+        #countdown { font-size: 2.2rem !important; }
 
-        /* Person Row */
-        .person-item {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            transition: background 0.2s;
-        }
-        .person-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
+        .birthday-today { border-color: var(--success) !important; animation: pulse 2s infinite; }
 
-        .avatar-circle {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background-color: var(--gold);
-            color: var(--navy-card);
-            font-weight: bold;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Pulse Animation for Birthday Today */
-        .today-active {
-            border-color: #2ecc71 !important;
-            animation: pulse-green 2s infinite;
-        }
-
-        @keyframes pulse-green {
+        @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
             100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
 
-        /* Dark Modal Styles */
-        .modal-content-dark {
-            background-color: var(--navy-light);
-            border: 1px solid var(--gold);
-            color: #fff;
-        }
-        .form-control-dark, .form-select-dark {
-            background-color: var(--bg-dark);
-            border: 1px solid var(--gold);
-            color: #fff;
-        }
-        .form-control-dark:focus, .form-select-dark:focus {
-            background-color: var(--bg-dark);
-            color: #fff;
-            border-color: var(--gold-light);
-            box-shadow: 0 0 0 0.25rem rgba(201, 153, 42, 0.25);
-        }
+        /* CALENDARIO ESTILOS */
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .month-card { background: var(--navy); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .month-name { font-family: 'Playfair Display', serif; color: var(--gold-light); border-bottom: 1px solid var(--gold); padding-bottom: 8px; margin-bottom: 12px; font-size: 1.1rem; }
+        
+        .person-row { display: flex; align-items: center; background: var(--glass); padding: 8px; border-radius: 8px; margin-bottom: 8px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--navy); display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; font-size: 0.75rem; }
+        .actions { display: flex; gap: 5px; margin-left: auto; }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 12px; padding: 4px; }
+        .btn-edit { color: var(--gold-light); }
+        .btn-delete { color: var(--danger); }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--navy-light); padding: 30px; border-radius: 15px; width: 350px; border: 1px solid var(--gold); text-align: center; }
+        .btn-primary { background: var(--gold); border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--navy); }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; background: #051121; border: 1px solid var(--gold); color: white; border-radius: 6px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
-        <div class="container-fluid container-xl">
-            <a class="navbar-brand font-playfair fw-bold text-warning" href="#">
-                <i class="bi bi-calendar-event me-2"></i>Calendario MBA
-            </a>
-            <span class="navbar-text text-light opacity-75 small d-none d-sm-inline">
-                IUB · Maestría en Administración · 2026
-            </span>
-            <button class="btn btn-warning fw-bold btn-sm ms-auto" onclick="openModal()">
-                <i class="bi bi-person-plus-fill me-1"></i> Agregar Registro
-            </button>
+<div class="container">
+    <!-- DASHBOARD SUPERIOR -->
+    <div class="dashboard">
+        <div class="widget">
+            <h3>Total Grupo</h3>
+            <div class="val" id="countTotal">0</div>
+            <div class="sub">Compañeros MBA</div>
         </div>
-    </nav>
-
-    <!-- MAIN CONTAINER -->
-    <div class="container-xl">
-
-        <!-- DASHBOARD WIDGETS -->
-        <div class="row g-3 mb-4">
-            <!-- Total -->
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="widget-card p-3 h-100 text-center">
-                    <div class="widget-title">Total Grupo</div>
-                    <div class="widget-value font-playfair my-1" id="countTotal">0</div>
-                    <div class="text-muted small">Compañeros MBA</div>
-                </div>
-            </div>
-
-            <!-- Próximo Cumpleaños (2 columnas en escritorio) -->
-            <div class="col-12 col-md-6 order-first order-md-0">
-                <div class="widget-card widget-main p-3 h-100 text-center">
-                    <div class="widget-title" id="nextLabel">Próximo Cumpleaños</div>
-                    <div class="widget-value font-playfair my-1 fs-2" id="countdown">--d --h --m --s</div>
-                    <div class="text-warning small fw-bold" id="nextPersonName">Cargando eventos...</div>
-                </div>
-            </div>
-
-            <!-- Mes Actual -->
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="widget-card p-3 h-100 text-center">
-                    <div class="widget-title">Mes Actual</div>
-                    <div class="widget-value font-playfair my-1" id="countMonth">0</div>
-                    <div class="text-muted small" id="currentMonthName">--</div>
-                </div>
-            </div>
-
-            <!-- Cumpleaños Hoy -->
-            <div class="col-12">
-                <div class="widget-card p-3 text-center" id="todayWidget">
-                    <div class="widget-title"><i class="bi bi-cake2-fill me-1"></i> Hoy</div>
-                    <div class="widget-value font-playfair my-1 fs-5" id="todayName">Nadie cumple hoy</div>
-                    <div class="text-muted small">¡Envía un saludo al grupo! 🥳</div>
-                </div>
-            </div>
+        <div class="widget-main widget">
+            <h3 id="nextLabel">Próximo Cumpleaños</h3>
+            <div class="val" id="countdown">--d --h --m --s</div>
+            <div class="sub" id="nextPersonName">Cargando eventos...</div>
         </div>
-
-        <!-- CALENDAR GRID -->
-        <div id="calendarGrid" class="row g-3"></div>
-
-    </div>
-
-    <!-- MODAL BOOTSTRAP -->
-    <div class="modal fade" id="formModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-content-dark p-2">
-                <div class="modal-header border-bottom-0">
-                    <h5 class="modal-title font-playfair text-warning" id="modalTitle">Gestionar Compañero</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="editId">
-                    
-                    <div class="mb-3 text-start">
-                        <label for="name" class="form-label small text-warning">Nombre Completo</label>
-                        <input type="text" class="form-control form-control-dark" id="name" placeholder="Ej. María Gómez">
-                    </div>
-
-                    <div class="row g-2 mb-3">
-                        <div class="col-7 text-start">
-                            <label for="month" class="form-label small text-warning">Mes</label>
-                            <select class="form-select form-select-dark" id="month"></select>
-                        </div>
-                        <div class="col-5 text-start">
-                            <label for="day" class="form-label small text-warning">Día</label>
-                            <input type="number" class="form-control form-control-dark" id="day" placeholder="1-31" min="1" max="31">
-                        </div>
-                    </div>
-
-                    <button class="btn btn-warning w-100 fw-bold py-2 mt-2" id="btnSave" onclick="saveData()">
-                        <i class="bi bi-check-circle-fill me-1"></i> Guardar Datos
-                    </button>
-                </div>
-            </div>
+        <div class="widget">
+            <h3>Mes Actual</h3>
+            <div class="val" id="countMonth">0</div>
+            <div class="sub" id="currentMonthName">--</div>
+        </div>
+        <div class="widget" id="todayWidget">
+            <h3>Hoy</h3>
+            <div class="val" id="todayName" style="font-size: 1.2rem; margin: 15px 0;">Nadie cumple hoy</div>
+            <div class="sub">¡Felicítalos! 🥳</div>
         </div>
     </div>
 
-    <!-- Bootstrap v5.0 JS Bundle -->
-    <script src="https://cdn.jsdelivr.com/npm/bootstrap@5.0.2/dist/bootstrap.bundle.min.js"></script>
+    <div class="cal-header">
+        <div>
+            <h1 style="font-family:'Playfair Display'; margin:0; color: var(--gold-light);">Calendario de Cumpleaños</h1>
+            <p style="margin:0; opacity:0.6; font-size:0.8rem;">IUB · Maestría en Administración · 2026</p>
+        </div>
+        <button class="btn-primary" style="width:auto; padding: 10px 20px;" onclick="openModal()">+ Agregar Registro</button>
+    </div>
 
-    <!-- Firebase SDK Modules -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } 
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <div id="calendarGrid" class="cal-grid"></div>
+</div>
 
-        // Configuración Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDmk2mpWvlR8NbZicA7alTh7XFZw1KCtjA",
-            authDomain: "cumple-mba.firebaseapp.com",
-            projectId: "cumple-mba",
-            storageBucket: "cumple-mba.firebasestorage.app",
-            messagingSenderId: "34399858328",
-            appId: "1:34399858328:web:45f1925353e3348e396aed",
-            measurementId: "G-93RP7XSQYX"
-        };
+<!-- Modal -->
+<div class="modal" id="formModal">
+    <div class="modal-content">
+        <h2 id="modalTitle" style="color:var(--gold-light); margin-top: 0;">Gestionar Compañero</h2>
+        <input type="hidden" id="editId">
+        <input type="text" id="name" placeholder="Nombre completo">
+        <select id="month">
+            <option value="0">Enero</option><option value="1">Febrero</option>
+            <option value="2">Marzo</option><option value="3">Abril</option>
+            <option value="4">Mayo</option><option value="5">Junio</option>
+            <option value="6">Julio</option><option value="7">Agosto</option>
+            <option value="8">Septiembre</option><option value="9">Octubre</option>
+            <option value="10">Noviembre</option><option value="11">Diciembre</option>
+        </select>
+        <input type="number" id="day" placeholder="Día" min="1" max="31">
+        <button class="btn-primary" id="btnSave" onclick="saveData()">Guardar Datos</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:gray; width:100%; margin-top:15px; cursor:pointer;">Cerrar</button>
+    </div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const colRef = collection(db, "cumpleaños"); 
-        const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDmk2mpWvlR8NbZicA7alTh7XFZw1KCtjA",
+        authDomain: "cumple-mba.firebaseapp.com",
+        projectId: "cumple-mba",
+        storageBucket: "cumple-mba.firebasestorage.app",
+        messagingSenderId: "34399858328",
+        appId: "1:34399858328:web:45f1925353e3348e396aed",
+        measurementId: "G-93RP7XSQYX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const colRef = collection(db, "cumpleaños"); 
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    let timerInterval = null;
+
+    function initGrid() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        months.forEach((m, i) => {
+            grid.innerHTML += `<div class="month-card" id="month-${i}"><div class="month-name">${m}</div><div class="list"></div></div>`;
+        });
+    }
+
+    onSnapshot(colRef, (snapshot) => {
+        initGrid();
+        let bdays = [];
+        snapshot.forEach(d => { bdays.push({...d.data(), id: d.id}); });
+
+        // Ordenar y renderizar
+        bdays.sort((a, b) => a.day - b.day);
+        bdays.forEach(data => renderPerson(data));
         
-        let timerInterval = null;
-        let bsModal = null;
+        // Actualizar Dashboard
+        updateDashboard(bdays);
+    });
 
-        // Inicialización DOM
-        document.addEventListener('DOMContentLoaded', () => {
-            bsModal = new bootstrap.Modal(document.getElementById('formModal'));
-            populateMonthSelect();
-        });
+    function renderPerson(data) {
+        const list = document.querySelector(`#month-${data.month} .list`);
+        if(!list) return;
+        const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+        const div = document.createElement('div');
+        div.className = 'person-row';
+        div.innerHTML = `
+            <div class="avatar">${initials}</div>
+            <div style="flex:1">
+                <div style="font-size:0.8rem; font-weight:500;">${data.name}</div>
+                <div style="font-size:0.65rem; color:var(--gold)">${data.day} de ${months[data.month]}</div>
+            </div>
+            <div class="actions">
+                <button class="btn-icon btn-edit" onclick="editEntry('${data.id}', '${data.name}', ${data.month}, ${data.day})">✎</button>
+                <button class="btn-icon btn-delete" onclick="deleteEntry('${data.id}')">✕</button>
+            </div>`;
+        list.appendChild(div);
+    }
 
-        function populateMonthSelect() {
-            const select = document.getElementById('month');
-            select.innerHTML = months.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+    function updateDashboard(bdays) {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentDate = now.getDate();
+
+        // 1. Total
+        document.getElementById('countTotal').innerText = bdays.length;
+
+        // 2. Mes Actual
+        document.getElementById('currentMonthName').innerText = `Cumpleaños en ${months[currentMonth]}`;
+        const mesCount = bdays.filter(b => b.month === currentMonth).length;
+        document.getElementById('countMonth').innerText = mesCount;
+
+        // 3. Hoy
+        const cumplenHoy = bdays.filter(b => b.month === currentMonth && b.day === currentDate);
+        const todayWidget = document.getElementById('todayWidget');
+        if(cumplenHoy.length > 0) {
+            document.getElementById('todayName').innerText = cumplenHoy.map(b => b.name).join(', ');
+            todayWidget.classList.add('birthday-today');
+        } else {
+            document.getElementById('todayName').innerText = "Nadie cumple hoy";
+            todayWidget.classList.remove('birthday-today');
         }
 
-        function initGrid() {
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = months.map((m, i) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card-month p-3" id="month-${i}">
-                        <div class="card-month-title font-playfair fw-bold fs-5 mb-2">
-                            ${m}
-                        </div>
-                        <div class="list"></div>
-                    </div>
-                </div>
-            `).join('');
-        }
+        // 4. Countdown
+        if (bdays.length === 0) return;
+        if(timerInterval) clearInterval(timerInterval);
+        
+        const calc = () => {
+            const timeNow = new Date();
+            let next = bdays.map(b => {
+                let d = new Date(timeNow.getFullYear(), b.month, b.day);
+                if (d < timeNow && !(d.getMonth() === timeNow.getMonth() && d.getDate() === timeNow.getDate())) {
+                    d.setFullYear(timeNow.getFullYear() + 1);
+                }
+                return { ...b, full: d };
+            }).sort((a, b) => a.full - b.full)[0];
 
-        // Firebase Realtime Listener
-        onSnapshot(colRef, (snapshot) => {
-            initGrid();
-            let bdays = [];
-            snapshot.forEach(d => { bdays.push({...d.data(), id: d.id}); });
-
-            // Ordenamiento por día
-            bdays.sort((a, b) => a.day - b.day);
-            bdays.forEach(data => renderPerson(data));
-            
-            // Actualizar Métricas
-            updateDashboard(bdays);
-        });
-
-        function renderPerson(data) {
-            const list = document.querySelector(`#month-${data.month} .list`);
-            if(!list) return;
-
-            const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            
-            const div = document.createElement('div');
-            div.className = 'person-item d-flex align-items-center justify-content-between';
-            div.innerHTML = `
-                <div class="d-flex align-items-center me-2 overflow-hidden">
-                    <div class="avatar-circle flex-shrink-0 me-2">${initials}</div>
-                    <div class="text-truncate">
-                        <div class="fw-bold text-light small text-truncate">${data.name}</div>
-                        <div class="text-warning extra-small" style="font-size:0.75rem;">${data.day} de ${months[data.month]}</div>
-                    </div>
-                </div>
-                <div class="btn-group flex-shrink-0">
-                    <button class="btn btn-link text-warning p-1 btn-sm" onclick="editEntry('${data.id}', '${data.name}', ${data.month}, ${data.day})" title="Editar">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-link text-danger p-1 btn-sm" onclick="deleteEntry('${data.id}')" title="Eliminar">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </div>
-            `;
-            list.appendChild(div);
-        }
-
-        function updateDashboard(bdays) {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentDate = now.getDate();
-
-            // 1. Total
-            document.getElementById('countTotal').innerText = bdays.length;
-
-            // 2. Mes Actual
-            document.getElementById('currentMonthName').innerText = `Cumpleaños en ${months[currentMonth]}`;
-            const mesCount = bdays.filter(b => Number(b.month) === currentMonth).length;
-            document.getElementById('countMonth').innerText = mesCount;
-
-            // 3. Hoy
-            const cumplenHoy = bdays.filter(b => Number(b.month) === currentMonth && Number(b.day) === currentDate);
-            const todayWidget = document.getElementById('todayWidget');
-            
-            if(cumplenHoy.length > 0) {
-                document.getElementById('todayName').innerText = cumplenHoy.map(b => b.name).join(', ');
-                todayWidget.classList.add('today-active');
-            } else {
-                document.getElementById('todayName').innerText = "Nadie cumple hoy";
-                todayWidget.classList.remove('today-active');
-            }
-
-            // 4. Conteo Regresivo
-            if (bdays.length === 0) {
-                document.getElementById('countdown').innerText = "Sin registros";
-                document.getElementById('nextPersonName').innerText = "Agrega compañeros para iniciar";
+            document.getElementById('nextPersonName').innerText = `Es el cumpleaños de ${next.name}`;
+            const diff = next.full - new Date();
+            if(diff <= 0) {
+                document.getElementById('countdown').innerText = "¡FELIZ CUMPLEAÑOS!";
                 return;
             }
-            
-            if(timerInterval) clearInterval(timerInterval);
-            
-            const calcCountdown = () => {
-                const timeNow = new Date();
-                
-                let next = bdays.map(b => {
-                    let target = new Date(timeNow.getFullYear(), b.month, b.day, 0, 0, 0);
-                    // Si ya pasó el cumpleaños este año, proyectar al siguiente
-                    if (target < timeNow && !(target.getMonth() === timeNow.getMonth() && target.getDate() === timeNow.getDate())) {
-                        target.setFullYear(timeNow.getFullYear() + 1);
-                    }
-                    return { ...b, fullDate: target };
-                }).sort((a, b) => a.fullDate - b.fullDate)[0];
-
-                document.getElementById('nextPersonName').innerText = `Es el cumpleaños de ${next.name}`;
-                
-                const diff = next.fullDate - new Date();
-                if(diff <= 0) {
-                    document.getElementById('countdown').innerText = "¡FELIZ CUMPLEAÑOS!";
-                    return;
-                }
-
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                const mins = Math.floor((diff / 1000 / 60) % 60);
-                const secs = Math.floor((diff / 1000) % 60);
-                
-                document.getElementById('countdown').innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
-            };
-
-            calcCountdown();
-            timerInterval = setInterval(calcCountdown, 1000);
-        }
-
-        // --- ACCIONES DE PERSISTENCIA (CRUD) ---
-        window.saveData = async () => {
-            const id = document.getElementById('editId').value;
-            const name = document.getElementById('name').value.trim();
-            const month = parseInt(document.getElementById('month').value);
-            const day = parseInt(document.getElementById('day').value);
-
-            if (!name || isNaN(day) || day < 1 || day > 31) {
-                alert("Por favor ingresa un nombre válido y un día entre 1 y 31.");
-                return;
-            }
-
-            const btn = document.getElementById('btnSave');
-            btn.disabled = true; 
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Procesando...`;
-
-            try {
-                if (id) { 
-                    await updateDoc(doc(db, "cumpleaños", id), { name, month, day }); 
-                } else { 
-                    await addDoc(colRef, { name, month, day }); 
-                }
-                closeModal();
-            } catch (e) { 
-                alert("Error al guardar en Firebase: " + e.message); 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Guardar Datos`; 
-            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const mins = Math.floor((diff / 1000 / 60) % 60);
+            const secs = Math.floor((diff / 1000) % 60);
+            document.getElementById('countdown').innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
         };
+        calc();
+        timerInterval = setInterval(calc, 1000);
+    }
 
-        window.deleteEntry = async (id) => { 
-            if(confirm("¿Seguro que deseas eliminar este registro?")) {
-                await deleteDoc(doc(db, "cumpleaños", id)); 
-            }
-        };
+    // --- ACCIONES FORMULARIO ---
+    window.saveData = async () => {
+        const id = document.getElementById('editId').value;
+        const name = document.getElementById('name').value.trim();
+        const month = parseInt(document.getElementById('month').value);
+        const day = parseInt(document.getElementById('day').value);
 
-        window.editEntry = (id, n, m, d) => {
-            document.getElementById('modalTitle').innerText = "Editar Compañero";
-            document.getElementById('editId').value = id;
-            document.getElementById('name').value = n;
-            document.getElementById('month').value = m;
-            document.getElementById('day').value = d;
-            bsModal.show();
-        };
+        if (!name || !day) return alert("Completa los datos");
+        const btn = document.getElementById('btnSave');
+        btn.disabled = true; btn.innerText = "Procesando...";
 
-        window.openModal = () => {
-            document.getElementById('modalTitle').innerText = "Nuevo Registro";
-            document.getElementById('editId').value = '';
-            document.getElementById('name').value = '';
-            document.getElementById('day').value = '';
-            bsModal.show();
-        };
+        try {
+            if (id) { await updateDoc(doc(db, "cumpleaños", id), { name, month, day }); }
+            else { await addDoc(colRef, { name, month, day }); }
+            closeModal();
+        } catch (e) { alert("Error: " + e.message); }
+        finally { btn.disabled = false; btn.innerText = "Guardar Datos"; }
+    };
 
-        window.closeModal = () => bsModal.hide();
-    </script>
+    window.deleteEntry = async (id) => { if(confirm("¿Eliminar registro?")) await deleteDoc(doc(db, "cumpleaños", id)); };
+    window.editEntry = (id, n, m, d) => {
+        document.getElementById('editId').value = id;
+        document.getElementById('name').value = n;
+        document.getElementById('month').value = m;
+        document.getElementById('day').value = d;
+        document.getElementById('formModal').style.display = 'flex';
+    };
+    window.openModal = () => {
+        document.getElementById('editId').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('day').value = '';
+        document.getElementById('formModal').style.display = 'flex';
+    };
+    window.closeModal = () => document.getElementById('formModal').style.display = 'none';
+</script>
 </body>
 </html>
